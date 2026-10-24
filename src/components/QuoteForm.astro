@@ -1,0 +1,300 @@
+---
+import Icon from './Icon.astro';
+import { services } from '../data/services';
+import { routes, useT, type Lang } from '../i18n/ui';
+import { whatsappLink } from '../config';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const budgets = [1, 2, 3, 4, 5].map((n) => t(`form.budget.${n}` as 'form.budget.1'));
+const errors = {
+  required: t('form.err.required'),
+  email: t('form.err.email'),
+  phone: t('form.err.phone'),
+  file: t('form.err.file'),
+  consent: t('form.err.consent'),
+  sending: t('form.sending'),
+  submit: t('form.submit'),
+};
+---
+<form class="qf" action="/api/devis" method="post" enctype="multipart/form-data" novalidate data-quote-form data-errors={JSON.stringify(errors)}>
+  <input type="hidden" name="lang" value={lang} />
+  <div class="hp" aria-hidden="true">
+    <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+  </div>
+
+  <div class="qf-summary callout" role="alert" hidden data-summary>
+    <Icon name="alert" size={22} />
+    <p>{t('form.err.summary')}</p>
+  </div>
+
+  <div class="qf-grid">
+    <div class="field">
+      <label for="f-name">{t('form.name')}</label>
+      <input id="f-name" name="name" type="text" autocomplete="name" required maxlength="120" />
+    </div>
+    <div class="field">
+      <label for="f-company">{t('form.company')} <span class="opt">({t('form.optional')})</span></label>
+      <input id="f-company" name="company" type="text" autocomplete="organization" maxlength="120" />
+    </div>
+    <div class="field">
+      <label for="f-email">{t('form.email')}</label>
+      <input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="160" />
+    </div>
+    <div class="field">
+      <label for="f-phone">{t('form.phone')}</label>
+      <input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required placeholder="+237 6XX XX XX XX" data-validate="phone" maxlength="30" />
+    </div>
+    <div class="field">
+      <label for="f-service">{t('form.service')}</label>
+      <div class="select">
+        <select id="f-service" name="service" required>
+          <option value="">{t('form.servicePlaceholder')}</option>
+          {services.map((s) => <option value={s.id}>{s.title[lang]}</option>)}
+          <option value="collab">{t('form.collab')}</option>
+          <option value="other">{t('form.other')}</option>
+        </select>
+        <Icon name="chevronDown" size={18} />
+      </div>
+    </div>
+    <div class="field">
+      <label for="f-budget">{t('form.budget')} <span class="opt">({t('form.optional')})</span></label>
+      <div class="select">
+        <select id="f-budget" name="budget">
+          <option value="">{t('form.budgetPlaceholder')}</option>
+          {budgets.map((b) => <option value={b}>{b}</option>)}
+        </select>
+        <Icon name="chevronDown" size={18} />
+      </div>
+    </div>
+    <div class="field full">
+      <label for="f-message">{t('form.message')}</label>
+      <textarea id="f-message" name="message" rows="6" required maxlength="4000" placeholder={t('form.messagePlaceholder')}></textarea>
+    </div>
+    <div class="field full">
+      <span class="label" id="f-file-label">{t('form.file')} <span class="opt">({t('form.optional')})</span></span>
+      <label class="file" for="f-file">
+        <Icon name="clip" size={20} />
+        <span data-file-name>{t('form.fileHint')}</span>
+      </label>
+      <input id="f-file" name="attachment" type="file" class="sr-only" aria-labelledby="f-file-label" accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.ppt,.pptx" data-validate="file" />
+    </div>
+    <div class="field full">
+      <label class="check">
+        <input type="checkbox" name="consent" value="yes" required />
+        <span class="box" aria-hidden="true"><Icon name="check" size={16} /></span>
+        <span>{t('form.consent')} <a class="text-link" href={routes.privacy[lang]}>{t('form.privacy')}</a>.</span>
+      </label>
+    </div>
+  </div>
+
+  <button class="btn btn-primary btn-lg qf-submit" type="submit" data-submit>{t('form.submit')}</button>
+
+  <div class="qf-result callout" role="status" hidden data-success>
+    <Icon name="checkCircle" size={26} />
+    <div>
+      <p class="qf-result-title">{t('form.success.title')}</p>
+      <p>{t('form.success.text')}</p>
+    </div>
+  </div>
+  <div class="qf-result callout" role="alert" hidden data-error>
+    <Icon name="alert" size={26} />
+    <div>
+      <p class="qf-result-title">{t('form.error.title')}</p>
+      <p>{t('form.error.text')} <a class="text-link" href={whatsappLink(t('wa.message'))} target="_blank" rel="noopener">WhatsApp</a></p>
+    </div>
+  </div>
+</form>
+
+<script>
+  const MAX_FILE = 5 * 1024 * 1024;
+
+  document.querySelectorAll<HTMLFormElement>('[data-quote-form]').forEach((form) => {
+    const msg = JSON.parse(form.dataset.errors!);
+    const summary = form.querySelector<HTMLElement>('[data-summary]')!;
+    const success = form.querySelector<HTMLElement>('[data-success]')!;
+    const failure = form.querySelector<HTMLElement>('[data-error]')!;
+    const submit = form.querySelector<HTMLButtonElement>('[data-submit]')!;
+    const fileInput = form.querySelector<HTMLInputElement>('input[type=file]')!;
+    const fileName = form.querySelector<HTMLElement>('[data-file-name]')!;
+    const fileHint = fileName.textContent;
+
+    // Service présélectionné depuis une page service (?service=video).
+    const pre = new URLSearchParams(location.search).get('service');
+    const select = form.querySelector<HTMLSelectElement>('select[name=service]')!;
+    if (pre && [...select.options].some((o) => o.value === pre)) select.value = pre;
+
+    fileInput.addEventListener('change', () => {
+      const f = fileInput.files?.[0];
+      fileName.textContent = f ? f.name : fileHint;
+      validate(fileInput);
+    });
+
+    const fields = [...form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('input:not([type=hidden]):not([name=website]), select, textarea')];
+
+    function errorFor(el: (typeof fields)[number]): string {
+      if (el instanceof HTMLInputElement && el.type === 'checkbox') return el.required && !el.checked ? msg.consent : '';
+      if (el instanceof HTMLInputElement && el.type === 'file') {
+        const f = el.files?.[0];
+        return f && f.size > MAX_FILE ? msg.file : '';
+      }
+      const v = el.value.trim();
+      if (el.required && !v) return msg.required;
+      if (v && el instanceof HTMLInputElement && el.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return msg.email;
+      if (v && el.dataset.validate === 'phone' && v.replace(/[^\d]/g, '').length < 8) return msg.phone;
+      return '';
+    }
+
+    function validate(el: (typeof fields)[number]) {
+      const field = el.closest('.field')!;
+      const error = errorFor(el);
+      let node = field.querySelector<HTMLElement>('.field-error');
+      field.classList.toggle('has-error', !!error);
+      el.setAttribute('aria-invalid', String(!!error));
+      if (error) {
+        if (!node) {
+          node = document.createElement('p');
+          node.className = 'field-error';
+          node.id = `${el.id || el.name}-error`;
+          field.appendChild(node);
+        }
+        node.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5.5M12 16.2v.3"/></svg><span>${error}</span>`;
+        el.setAttribute('aria-describedby', node.id);
+      } else if (node) {
+        node.remove();
+        el.removeAttribute('aria-describedby');
+      }
+      return !error;
+    }
+
+    fields.forEach((el) => {
+      el.addEventListener('blur', () => { if (el.closest('.field')!.classList.contains('has-error') || el.value) validate(el); });
+      el.addEventListener('input', () => { if (el.closest('.field')!.classList.contains('has-error')) validate(el); });
+      el.addEventListener('change', () => { if (el.closest('.field')!.classList.contains('has-error')) validate(el); });
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      success.hidden = true;
+      failure.hidden = true;
+      const invalid = fields.filter((el) => !validate(el));
+      summary.hidden = invalid.length === 0;
+      if (invalid.length) { invalid[0].focus(); return; }
+
+      submit.disabled = true;
+      submit.textContent = msg.sending;
+      try {
+        const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error(String(res.status));
+        form.reset();
+        fileName.textContent = fileHint;
+        success.hidden = false;
+        success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch {
+        failure.hidden = false;
+      } finally {
+        submit.disabled = false;
+        submit.textContent = msg.submit;
+      }
+    });
+  });
+</script>
+
+<style>
+  .qf { display: grid; gap: 1.75rem; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .qf-grid { display: grid; gap: 1.25rem 1.25rem; }
+  @media (min-width: 720px) {
+    .qf-grid { grid-template-columns: 1fr 1fr; }
+    .full { grid-column: 1 / -1; }
+  }
+
+  .field { display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
+  .field label, .label { font-size: 0.875rem; font-weight: 500; color: var(--ink); }
+  .opt { font-weight: 400; color: var(--muted); }
+
+  input:not([type=checkbox]):not([type=file]), select, textarea {
+    width: 100%;
+    min-height: 54px;
+    padding: 0.9rem 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--line-strong);
+    background: var(--white);
+    font-size: 1rem;
+    color: var(--ink);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  textarea { resize: vertical; min-height: 150px; line-height: 1.5; }
+  input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.8; }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--night);
+    box-shadow: 0 0 0 4px var(--highlight);
+  }
+
+  .select { position: relative; }
+  .select select { padding-right: 2.75rem; cursor: pointer; }
+  .select :global(svg) { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--muted); }
+
+  .file {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 54px;
+    padding: 0.9rem 1rem;
+    border: 1.5px dashed var(--line-strong);
+    border-radius: var(--radius);
+    color: var(--muted);
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+  .file:hover { border-color: var(--night); background: var(--soft); }
+  .file span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .field:focus-within .file { border-color: var(--night); box-shadow: 0 0 0 4px var(--highlight); }
+
+  .check { display: flex; align-items: flex-start; gap: 0.85rem; cursor: pointer; font-size: 0.9375rem !important; font-weight: 400 !important; }
+  .check input { position: absolute; opacity: 0; width: 24px; height: 24px; margin: 0; }
+  .box {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 1.5px solid var(--line-strong);
+    color: transparent;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  }
+  .check input:checked + .box { background: var(--night); border-color: var(--night); color: var(--white); }
+  .check input:focus-visible + .box { outline: 2px solid var(--blue); outline-offset: 3px; }
+
+  /* Erreurs : bleu nuit + icône + texte, jamais la couleur seule (charte 7.3). */
+  .field:global(.has-error) input:not([type=checkbox]),
+  .field:global(.has-error) select,
+  .field:global(.has-error) textarea,
+  .field:global(.has-error) .file,
+  .field:global(.has-error) .box { border: 2px solid var(--night); }
+  .field :global(.field-error) {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--night);
+  }
+  .field :global(.field-error svg) { flex-shrink: 0; margin-top: 1px; }
+
+  .qf-summary, .qf-result { display: flex; gap: 0.85rem; align-items: flex-start; color: var(--night); }
+  .qf-summary[hidden], .qf-result[hidden] { display: none; }
+  .qf-summary p { margin: 0; font-weight: 500; }
+  .qf-result :global(svg) { flex-shrink: 0; }
+  .qf-result-title { font-weight: 600; margin-bottom: 0.25rem; }
+  .qf-submit { justify-self: start; }
+  .qf-submit:disabled { opacity: 0.6; cursor: progress; }
+  @media (max-width: 719px) { .qf-submit { justify-self: stretch; } }
+</style>

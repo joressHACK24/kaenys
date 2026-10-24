@@ -1,0 +1,107 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { routes, useT, type Lang } from '../i18n/ui';
+import { services, servicePath } from '../data/services';
+import { SITE, whatsappLink } from '../config';
+
+interface Props { lang: Lang; altHref: string }
+const { lang, altHref } = Astro.props;
+const t = useT(lang);
+const year = new Date().getFullYear();
+---
+<footer class="footer bg-night">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href={routes.home[lang]} class="footer-logo" aria-label="Kaenys"><Logo tone="light" /></a>
+        <p class="muted">{t('footer.tagline')}</p>
+        <ul class="social">
+          <li><a href={SITE.social.instagram} aria-label="Instagram" rel="noopener" target="_blank"><Icon name="instagram" /></a></li>
+          <li><a href={SITE.social.facebook} aria-label="Facebook" rel="noopener" target="_blank"><Icon name="facebook" /></a></li>
+          <li><a href={SITE.social.linkedin} aria-label="LinkedIn" rel="noopener" target="_blank"><Icon name="linkedin" /></a></li>
+        </ul>
+      </div>
+
+      <nav class="footer-cols" aria-label={t('footer.explore')}>
+        <div>
+          <h2 class="footer-h">{t('footer.services')}</h2>
+          <ul>
+            {services.map((s) => <li><a href={servicePath(s, lang)}>{s.title[lang]}</a></li>)}
+          </ul>
+        </div>
+        <div>
+          <h2 class="footer-h">{t('footer.explore')}</h2>
+          <ul>
+            <li><a href={routes.work[lang]}>{t('nav.work')}</a></li>
+            <li><a href={routes.about[lang]}>{t('nav.about')}</a></li>
+            <li><a href={routes.pricing[lang]}>{t('nav.pricing')}</a></li>
+            <li><a href={routes.contact[lang]}>{t('nav.quote')}</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="footer-h">{t('footer.contact')}</h2>
+          <ul>
+            <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
+            <li><a href={whatsappLink(t('wa.message'))} rel="noopener" target="_blank">WhatsApp</a></li>
+            <li><a href={`tel:${SITE.phone.replace(/\s/g, '')}`}>{SITE.phone}</a></li>
+            <li class="muted">{t('footer.location')}</li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+    <hr class="footer-rule" />
+
+    <div class="footer-bottom">
+      <p>© {year} Kaenys. {t('footer.rights')}</p>
+      <ul>
+        <li><a href={routes.legal[lang]}>{t('legal.legal')}</a></li>
+        <li><a href={routes.privacy[lang]}>{t('legal.privacy')}</a></li>
+        <li><a href={routes.terms[lang]}>{t('legal.terms')}</a></li>
+        <li><a href={altHref} hreflang={lang === 'fr' ? 'en' : 'fr'}>{t('nav.switch')}</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer { padding: clamp(56px, 8vw, 96px) 0 calc(32px + env(safe-area-inset-bottom)); font-size: 0.875rem; }
+  .footer-top { display: grid; gap: 3rem; }
+  .footer-logo { display: block; height: 28px; margin-bottom: 1rem; }
+  .footer-brand p { max-width: 28ch; }
+  .social { display: flex; gap: 0.25rem; list-style: none; padding: 0; margin: 1.25rem 0 0 -10px; }
+  .social a {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    color: rgba(255, 255, 255, 0.72);
+    transition: color 0.2s;
+  }
+  .social a:hover { color: var(--white); }
+
+  .footer-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2.5rem 1.5rem; }
+  .footer-h {
+    font-family: var(--font-text);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    color: var(--white);
+    margin: 0 0 0.9rem;
+  }
+  .footer ul { list-style: none; margin: 0; padding: 0; }
+  .footer-cols li { margin-bottom: 0.6rem; }
+  .footer a { color: rgba(255, 255, 255, 0.72); text-decoration: none; transition: color 0.2s; }
+  .footer a:hover { color: var(--white); text-decoration: underline; text-underline-offset: 3px; }
+
+  .footer-rule { border: 0; height: 1px; background: rgba(255, 255, 255, 0.14); margin: 3rem 0 1.5rem; }
+  .footer-bottom { display: flex; flex-wrap: wrap; gap: 1rem 2rem; justify-content: space-between; color: rgba(255, 255, 255, 0.6); }
+  .footer-bottom p { margin: 0; }
+  .footer-bottom ul { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
+
+  @media (min-width: 900px) {
+    .footer-top { grid-template-columns: 1fr 2fr; }
+    .footer-cols { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+</style>

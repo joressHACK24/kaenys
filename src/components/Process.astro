@@ -1,0 +1,135 @@
+---
+import { useT, type Lang } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const steps = [1, 2, 3, 4].map((n) => ({
+  n,
+  title: t(`process.${n}.title` as 'process.1.title'),
+  text: t(`process.${n}.text` as 'process.1.text'),
+}));
+---
+<section class="process section bg-night" aria-labelledby="process-title" data-process>
+  <div class="container">
+    <div class="process-grid">
+      <div class="process-aside">
+        <div class="process-sticky">
+          <p class="eyebrow">{t('home.process.eyebrow')}</p>
+          <h2 id="process-title" class="t-1">{t('home.process.title')}</h2>
+          <div class="process-counter" aria-hidden="true">
+            <span class="process-num" data-process-num>01</span>
+            <span class="process-total">/ 04</span>
+          </div>
+          <div class="process-bar" aria-hidden="true"><span data-process-bar></span></div>
+        </div>
+      </div>
+
+      <ol class="process-steps">
+        {steps.map((s) => (
+          <li class="process-step" data-step={s.n}>
+            <span class="process-step-n" aria-hidden="true">0{s.n}</span>
+            <h3 class="t-2">{s.title}</h3>
+            <p class="lead">{s.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-process]');
+  if (root) {
+    const steps = [...root.querySelectorAll<HTMLElement>('[data-step]')];
+    const num = root.querySelector<HTMLElement>('[data-process-num]')!;
+    const bar = root.querySelector<HTMLElement>('[data-process-bar]')!;
+    let active = 0;
+
+    const setActive = (i: number) => {
+      if (i === active && steps[i].classList.contains('is-active')) return;
+      active = i;
+      steps.forEach((s, j) => s.classList.toggle('is-active', j === i));
+      num.classList.remove('flip');
+      void num.offsetWidth;
+      num.textContent = `0${i + 1}`;
+      num.classList.add('flip');
+      bar.style.transform = `scaleX(${(i + 1) / steps.length})`;
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) if (e.isIntersecting) setActive(steps.indexOf(e.target as HTMLElement));
+      },
+      { rootMargin: '-45% 0px -45% 0px' },
+    );
+    steps.forEach((s) => io.observe(s));
+    setActive(0);
+  }
+</script>
+
+<style>
+  .process-grid { display: grid; gap: 3rem; }
+  .process-counter { display: none; }
+  .process-bar { display: none; }
+
+  .process-steps { list-style: none; margin: 0; padding: 0; counter-reset: s; }
+  .process-step { padding: 2.25rem 0; border-top: 1px solid rgba(255, 255, 255, 0.14); }
+  .process-step-n {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.1875rem;
+    font-weight: 600;
+    color: var(--sky);
+    margin-bottom: 0.75rem;
+  }
+  .process-step .lead { margin-top: 1rem; max-width: 36ch; }
+
+  @media (min-width: 960px) {
+    .process-grid { grid-template-columns: 5fr 6fr; gap: 6rem; }
+    .process-sticky { position: sticky; top: calc(var(--nav-h) + 12vh); }
+    .process-counter {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      margin-top: 3.5rem;
+      font-family: var(--font-display);
+      font-weight: 600;
+      letter-spacing: -0.04em;
+      overflow: hidden;
+    }
+    .process-num { font-size: clamp(5rem, 10vw, 9rem); line-height: 1; color: var(--sky); display: inline-block; }
+    .process-num:global(.flip) { animation: flip 0.6s var(--ease); }
+    .process-total { font-size: 1.5rem; color: rgba(255, 255, 255, 0.5); }
+    .process-bar {
+      display: block;
+      margin-top: 2rem;
+      height: 2px;
+      max-width: 320px;
+      background: rgba(255, 255, 255, 0.14);
+      overflow: hidden;
+    }
+    .process-bar span {
+      display: block;
+      height: 100%;
+      background: var(--sky);
+      transform-origin: left;
+      transform: scaleX(0.25);
+      transition: transform 0.8s var(--ease);
+    }
+    .process-step {
+      min-height: 62vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-top: 0;
+      padding: 0;
+      opacity: 0.28;
+      transition: opacity 0.6s var(--ease);
+    }
+    :global(.js) .process-step:global(.is-active) { opacity: 1; }
+    .process-step-n { display: none; }
+  }
+  @keyframes flip { from { transform: translate3d(0, 40%, 0); opacity: 0; } }
+  :global(html:not(.js)) .process-step { opacity: 1; }
+</style>

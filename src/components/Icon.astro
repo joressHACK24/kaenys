@@ -1,0 +1,59 @@
+---
+// Une seule famille d'icônes : trait fin de 1,5 px, extrémités arrondies, grille 24 px.
+interface Props {
+  name: string;
+  size?: number;
+  class?: string;
+  label?: string;
+}
+const { name, size = 24, class: cls = '', label } = Astro.props;
+
+const paths: Record<string, string> = {
+  pen: '<path d="M4 20l1.2-4.6L15.6 5a2.1 2.1 0 013 3L8.2 18.4 4 20z"/><path d="M13.5 7.1l3 3"/>',
+  chat: '<path d="M4.5 5.5h15v10h-8.5l-4.5 3.5v-3.5h-2z"/><path d="M8.5 9.5h7M8.5 12h4.5"/>',
+  play: '<rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M10.2 9.2v5.6l4.8-2.8z"/>',
+  code: '<path d="M8.5 7.5L4 12l4.5 4.5M15.5 7.5L20 12l-4.5 4.5M13.2 5.5l-2.4 13"/>',
+  spark: '<path d="M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9z"/><path d="M18.5 16v4M16.5 18h4"/>',
+  book: '<path d="M4 5.5c2.8-1 5.5-.8 8 .9v13c-2.5-1.7-5.2-1.9-8-.9z"/><path d="M20 5.5c-2.8-1-5.5-.8-8 .9v13c2.5-1.7 5.2-1.9 8-.9z"/>',
+  arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  chevron: '<path d="M9 5l7 7-7 7"/>',
+  chevronDown: '<path d="M5 9l7 7 7-7"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  checkCircle: '<circle cx="12" cy="12" r="8.5"/><path d="M8.2 12.3l2.6 2.6 5-5.2"/>',
+  alert: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5.5M12 16.2v.3"/>',
+  mail: '<rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4 7l8 6 8-6"/>',
+  phone: '<path d="M6.5 3.5h3l1.5 4-2 1.3a10 10 0 005.2 5.2l1.3-2 4 1.5v3a2 2 0 01-2.2 2A15.5 15.5 0 014.5 5.7a2 2 0 012-2.2z"/>',
+  whatsapp: '<path d="M4.5 19.5l1.1-3.9A8 8 0 1112 20a8 8 0 01-3.6-.9z"/><path d="M9.2 8.6c.2-.4.5-.4.8-.4h.4c.2 0 .4.1.5.4l.6 1.4c.1.2 0 .5-.1.6l-.5.6c.6 1.1 1.4 1.9 2.5 2.5l.6-.5c.2-.2.4-.2.6-.1l1.4.6c.3.1.4.3.4.5v.4c0 .3 0 .6-.4.8-.5.3-1.2.5-1.9.3a7.5 7.5 0 01-5.2-5.2c-.2-.7 0-1.4.3-1.9z"/>',
+  pin: '<path d="M12 20.5s6.5-5.6 6.5-11a6.5 6.5 0 00-13 0c0 5.4 6.5 11 6.5 11z"/><circle cx="12" cy="9.5" r="2.3"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  users: '<circle cx="9" cy="8.5" r="3"/><path d="M3.5 19c.5-3 2.7-4.8 5.5-4.8s5 1.8 5.5 4.8"/><path d="M15.5 5.8a3 3 0 010 5.6M17.5 14.6c1.6.6 2.7 2.1 3 4.4"/>',
+  target: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".6"/>',
+  heart: '<path d="M12 19.5s-7.5-4.4-7.5-10A4.2 4.2 0 0112 7a4.2 4.2 0 017.5 2.5c0 5.6-7.5 10-7.5 10z"/>',
+  bolt: '<path d="M13 3.5L5.5 13.5h6l-1 7 7.5-10h-6z"/>',
+  eye: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
+  clip: '<path d="M19 11.5l-7.2 7.2a4.5 4.5 0 01-6.4-6.4l7.8-7.8a3 3 0 014.2 4.2l-7.6 7.6a1.5 1.5 0 01-2.1-2.1l6.9-6.9"/>',
+  menu: '<path d="M4 8h16M4 16h16"/>',
+  close: '<path d="M6 6l12 12M18 6L6 18"/>',
+  globe: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.3 2.4 3.4 5.2 3.4 8.5S14.3 18.1 12 20.5c-2.3-2.4-3.4-5.2-3.4-8.5S9.7 5.9 12 3.5z"/>',
+  instagram: '<rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.7"/><circle cx="16.8" cy="7.2" r=".5"/>',
+  facebook: '<path d="M13.5 20.5v-7h2.4l.4-2.8h-2.8V8.9c0-.8.3-1.4 1.4-1.4h1.5V5a17 17 0 00-2.2-.1c-2.2 0-3.6 1.3-3.6 3.7v2.1H8.2v2.8h2.4v7"/>',
+  linkedin: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.2 10.5v5.5M8.2 7.8v.2M11.5 16v-5.5M11.5 13c0-1.5 1-2.6 2.3-2.6s2.1.9 2.1 2.5V16"/>',
+};
+const body = paths[name] ?? '';
+---
+<svg
+  class={`icon ${cls}`}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.5"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden={label ? undefined : 'true'}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  set:html={body}
+/>

@@ -1,0 +1,67 @@
+---
+import ProjectVisual from './ProjectVisual.astro';
+import Icon from './Icon.astro';
+import { projectPath, type Project } from '../data/projects';
+import { serviceById } from '../data/services';
+import { useT, type Lang } from '../i18n/ui';
+
+interface Props { project: Project; lang: Lang; delay?: number; large?: boolean; level?: 2 | 3 }
+const { project: p, lang, delay = 0, large = false, level = 3 } = Astro.props;
+const Heading = level === 2 ? 'h2' : 'h3';
+const t = useT(lang);
+const service = serviceById(p.service);
+---
+<article class:list={['pcard', { large }]} data-reveal style={`--delay:${delay}ms`} data-service={p.service}>
+  <a href={projectPath(p, lang)} class="pcard-link">
+    <div class="pcard-media">
+      {p.cover
+        ? <img src={p.cover} alt="" loading="lazy" decoding="async" width="800" height="600" />
+        : <ProjectVisual motif={p.motif} />}
+      {p.example && <span class="badge pcard-badge">{t('work.example')}</span>}
+    </div>
+    <div class="pcard-body">
+      <p class="pcard-service small">{service.title[lang]}</p>
+      <Heading class="t-4">{p.title[lang]}</Heading>
+      <p class="pcard-client muted">{p.client[lang]}</p>
+      <p class="pcard-result">{p.result[lang]}</p>
+      <span class="pcard-more">{t('work.view')} <Icon name="chevron" size={14} /></span>
+    </div>
+  </a>
+</article>
+
+<style>
+  .pcard { display: flex; }
+  .pcard-link {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    text-decoration: none;
+    color: inherit;
+  }
+  .pcard-media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--soft);
+  }
+  .pcard-media > :global(svg), .pcard-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.9s var(--ease);
+  }
+  .pcard-link:hover .pcard-media > :global(svg), .pcard-link:hover .pcard-media img { transform: scale(1.035); }
+  .pcard-badge { position: absolute; top: 14px; left: 14px; }
+
+  .pcard-body { padding: 20px 4px 0; }
+  .pcard-service { color: var(--muted); margin-bottom: 0.4rem; }
+  .pcard-client { margin: 0.35rem 0 0; font-size: 0.9375rem; }
+  .pcard-result { margin: 0.75rem 0 0.9rem; font-size: 1rem; }
+  .pcard-more { display: inline-flex; align-items: center; gap: 0.3rem; font-weight: 500; font-size: 1rem; color: var(--night); }
+  .pcard-more :global(svg) { transition: transform 0.3s var(--ease); }
+  .pcard-link:hover .pcard-more :global(svg) { transform: translateX(3px); }
+  .pcard-link:hover .t-4 { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1.5px; }
+
+  .large .pcard-media { aspect-ratio: 16 / 10; }
+</style>

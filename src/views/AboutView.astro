@@ -1,0 +1,179 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Icon from '../components/Icon.astro';
+import CTA from '../components/CTA.astro';
+import { routes, useT, type Lang } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+
+// Textes à relire par Joress. Photos de l'équipe : déposer en WebP dans /public/team/ et renseigner `photo`.
+const c = {
+  fr: {
+    story: [
+      'Kaenys prend la suite de Jolin. Le nom change, l’exigence reste : aider les entreprises et les particuliers à exister et à grandir grâce au numérique.',
+      'Nous sommes une équipe jeune, basée à Douala. Nous réunissons le design, la vidéo, le web, l’intelligence artificielle et la formation pour que nos clients n’aient qu’un seul interlocuteur.',
+      'Notre symbole, un « K » en forme de flèche montante, dit ce que nous voulons pour chaque client : de la progression et de l’élan.',
+    ],
+    team: [
+      { name: 'Joress Fritz Nyam Fotso', role: 'Associé · Offre, développement et outils numériques', bio: 'Conçoit nos offres, développe les sites et applications, et veille à la qualité de chaque livrable.', initials: 'JF', photo: '' },
+      { name: 'Bryan Nlend Biyeguel Linkholn', role: 'Associé · Production et relation client', bio: 'Dirige les tournages et la production sur place, et accompagne nos clients du premier échange à la livraison.', initials: 'BN', photo: '' },
+    ],
+    values: [
+      { icon: 'check', title: 'Fiable', text: 'Nous tenons les délais annoncés et nous disons les choses clairement.' },
+      { icon: 'bolt', title: 'Moderne', text: 'Nous utilisons les outils d’aujourd’hui, IA comprise, au service de résultats concrets.' },
+      { icon: 'eye', title: 'Clair', text: 'Des prix lisibles, des devis détaillés, un vocabulaire simple.' },
+      { icon: 'target', title: 'Ambitieux', text: 'Nous visons un niveau de qualité international, depuis le Cameroun.' },
+      { icon: 'heart', title: 'Humain', text: 'Nous travaillons avec de vraies personnes, et pour de vraies personnes.' },
+    ],
+    method: 'Brief, devis, production, livraison : quatre étapes, un seul interlocuteur, et des points d’avancement à chaque étape clé.',
+  },
+  en: {
+    story: [
+      'Kaenys is the successor to Jolin. The name has changed, the standards have not: helping businesses and individuals stand out and grow through digital.',
+      'We are a young team based in Douala. We bring together design, video, web, artificial intelligence and training so our clients only need one point of contact.',
+      'Our symbol, a “K” shaped like a rising arrow, says what we want for every client: progress and momentum.',
+    ],
+    team: [
+      { name: 'Joress Fritz Nyam Fotso', role: 'Partner · Offering, development and digital tools', bio: 'Designs our offering, builds websites and apps, and makes sure every deliverable meets our standards.', initials: 'JF', photo: '' },
+      { name: 'Bryan Nlend Biyeguel Linkholn', role: 'Partner · Production and client relations', bio: 'Leads on-site shoots and production, and supports our clients from the first conversation to delivery.', initials: 'BN', photo: '' },
+    ],
+    values: [
+      { icon: 'check', title: 'Reliable', text: 'We meet the deadlines we announce and we say things clearly.' },
+      { icon: 'bolt', title: 'Modern', text: 'We use today’s tools, AI included, to deliver concrete results.' },
+      { icon: 'eye', title: 'Clear', text: 'Readable prices, detailed quotes, plain language.' },
+      { icon: 'target', title: 'Ambitious', text: 'We aim for international quality, from Cameroon.' },
+      { icon: 'heart', title: 'Human', text: 'We work with real people, for real people.' },
+    ],
+    method: 'Brief, quote, production, delivery: four steps, one point of contact, and progress updates at every key stage.',
+  },
+}[lang];
+
+const seo = {
+  fr: { title: 'À propos : l’équipe Kaenys à Douala', description: 'Kaenys, successeur de Jolin, est une agence digitale jeune et exigeante basée à Douala. Découvrez notre histoire, notre équipe et nos valeurs.' },
+  en: { title: 'About: the Kaenys team in Douala', description: 'Kaenys, successor to Jolin, is a young and demanding digital agency based in Douala. Discover our story, our team and our values.' },
+}[lang];
+---
+<Layout lang={lang} title={seo.title} description={seo.description} altHref={routes.about[lang === 'fr' ? 'en' : 'fr']} current="about">
+  <PageHeader eyebrow={t('about.eyebrow')} title={t('about.title')} lead={t('about.lead')} />
+
+  <section class="section-tight" aria-labelledby="story-title">
+    <div class="container two">
+      <h2 id="story-title" class="t-2" data-reveal>{t('about.story.title')}</h2>
+      <div class="story" data-reveal style="--delay:80ms">
+        {c.story.map((p, i) => <p class={i === 0 ? 't-3 display first' : 'lead'}>{p}</p>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-soft" aria-labelledby="team-title">
+    <div class="container">
+      <h2 id="team-title" class="t-2 block-title" data-reveal>{t('about.team.title')}</h2>
+      <div class="team">
+        {c.team.map((m, i) => (
+          <article class="member" data-reveal style={`--delay:${i * 100}ms`}>
+            <div class="portrait">
+              {m.photo
+                ? <img src={m.photo} alt={m.name} width="800" height="1000" loading="lazy" />
+                : <span class="initials display" aria-hidden="true">{m.initials}</span>}
+            </div>
+            <h3 class="t-3">{m.name}</h3>
+            <p class="role">{m.role}</p>
+            <p class="muted">{m.bio}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="values-title">
+    <div class="container">
+      <h2 id="values-title" class="t-2 block-title" data-reveal>{t('about.values.title')}</h2>
+      <ul class="values">
+        {c.values.map((v, i) => (
+          <li data-reveal style={`--delay:${i * 70}ms`}>
+            <Icon name={v.icon} size={28} />
+            <h3 class="t-4">{v.title}</h3>
+            <p class="muted">{v.text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section-tight" aria-labelledby="method-title">
+    <div class="container two">
+      <h2 id="method-title" class="t-2" data-reveal>{t('about.method.title')}</h2>
+      <div data-reveal style="--delay:80ms">
+        <p class="lead">{c.method}</p>
+        <ol class="steps">
+          {[1, 2, 3, 4].map((n) => <li><span>0{n}</span>{t(`process.${n}.title` as 'process.1.title')}</li>)}
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight" aria-labelledby="partners-title">
+    <div class="container">
+      <div class="callout partners" data-reveal>
+        <div>
+          <h2 id="partners-title" class="t-3">{t('about.partners.title')}</h2>
+          <p>{t('about.partners.text')}</p>
+        </div>
+        <a class="btn btn-ghost" href={`${routes.contact[lang]}?service=collab`}>{t('about.partners.cta')}</a>
+      </div>
+    </div>
+  </section>
+
+  <CTA lang={lang} />
+</Layout>
+
+<style>
+  .two { display: grid; gap: 2rem; }
+  @media (min-width: 960px) { .two { grid-template-columns: 4fr 8fr; gap: 4rem; } }
+  .story .first { color: var(--night); margin-bottom: 1.5rem; }
+  .story .lead { color: var(--ink); }
+  .story .lead + .lead { margin-top: 1rem; }
+  .block-title { margin-bottom: clamp(32px, 5vw, 56px); }
+
+  .team { display: grid; gap: 48px 24px; }
+  @media (min-width: 720px) { .team { grid-template-columns: 1fr 1fr; } }
+  .portrait {
+    aspect-ratio: 4 / 5;
+    border-radius: var(--radius);
+    background: var(--night);
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    margin-bottom: 1.5rem;
+  }
+  .portrait img { width: 100%; height: 100%; object-fit: cover; }
+  .initials { font-size: clamp(4rem, 10vw, 7rem); color: var(--sky); letter-spacing: -0.04em; }
+  .role { font-weight: 500; color: var(--night); margin: 0.5rem 0 0.75rem; }
+
+  .values { list-style: none; margin: 0; padding: 0; display: grid; gap: 2.5rem 2rem; }
+  .values li { color: var(--night); border-top: 1px solid var(--line); padding-top: 1.5rem; }
+  .values h3 { margin: 1rem 0 0.5rem; }
+  .values p { font-size: 1rem; }
+  @media (min-width: 640px) { .values { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1024px) { .values { grid-template-columns: repeat(5, 1fr); } }
+
+  .steps { list-style: none; margin: 2rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  @media (min-width: 720px) { .steps { grid-template-columns: repeat(4, 1fr); } }
+  .steps li {
+    background: var(--soft);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    font-weight: 600;
+    color: var(--night);
+    display: grid;
+    gap: 0.4rem;
+  }
+  .steps span { font-family: var(--font-display); color: var(--blue); font-size: 1.25rem; }
+
+  .partners { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem 3rem; padding: clamp(28px, 4vw, 48px); }
+  .partners > div { max-width: 60ch; }
+  .partners h2 { margin-bottom: 0.75rem; }
+</style>

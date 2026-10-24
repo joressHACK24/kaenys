@@ -1,0 +1,71 @@
+---
+// Visuel de remplacement dessiné aux couleurs de la charte, utilisé tant qu'un projet n'a pas de vraie image.
+interface Props { motif: number; class?: string }
+const { motif, class: cls = '' } = Astro.props;
+const m = motif % 6;
+const bg = ['#003152', '#EAF6FB', '#F5FAFC', '#003152', '#EAF6FB', '#ADDFF1'][m];
+---
+<svg class={`pv ${cls}`} viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <rect width="800" height="600" fill={bg} />
+  {m === 0 && (
+    <g>
+      <circle cx="300" cy="230" r="90" fill="#ADDFF1" />
+      <path d="M470 120h120L330 470H210z" fill="#2C7FA8" />
+      <rect x="430" y="380" width="200" height="14" rx="7" fill="#FFFFFF" opacity=".9" />
+      <rect x="430" y="410" width="130" height="14" rx="7" fill="#FFFFFF" opacity=".5" />
+    </g>
+  )}
+  {m === 1 && (
+    <g>
+      <rect x="150" y="110" width="500" height="320" rx="20" fill="#003152" />
+      <path d="M370 210v120l100-60z" fill="#ADDFF1" />
+      <rect x="150" y="460" width="500" height="8" rx="4" fill="#ADDFF1" />
+      <rect x="150" y="460" width="210" height="8" rx="4" fill="#2C7FA8" />
+    </g>
+  )}
+  {m === 2 && (
+    <g>
+      <rect x="140" y="100" width="520" height="400" rx="16" fill="#FFFFFF" stroke="#003152" stroke-opacity=".14" />
+      <rect x="140" y="100" width="520" height="44" rx="16" fill="#003152" />
+      <circle cx="172" cy="122" r="6" fill="#ADDFF1" /><circle cx="194" cy="122" r="6" fill="#ADDFF1" opacity=".6" />
+      <rect x="180" y="190" width="260" height="26" rx="6" fill="#003152" />
+      <rect x="180" y="232" width="200" height="12" rx="6" fill="#5B6B7A" opacity=".5" />
+      <rect x="180" y="268" width="120" height="36" rx="8" fill="#2C7FA8" />
+      <rect x="470" y="180" width="150" height="150" rx="10" fill="#EAF6FB" />
+      <rect x="180" y="350" width="140" height="110" rx="10" fill="#EAF6FB" />
+      <rect x="330" y="350" width="140" height="110" rx="10" fill="#EAF6FB" />
+      <rect x="480" y="350" width="140" height="110" rx="10" fill="#ADDFF1" />
+    </g>
+  )}
+  {m === 3 && (
+    <g>
+      {[0, 1, 2].map((r) => [0, 1, 2].map((c) => (
+        <rect x={205 + c * 135} y={105 + r * 135} width="120" height="120" rx="10"
+          fill={(r + c) % 3 === 0 ? '#ADDFF1' : (r + c) % 3 === 1 ? '#2C7FA8' : '#EAF6FB'} opacity={(r * 3 + c) % 4 === 0 ? 1 : 0.85} />
+      )))}
+    </g>
+  )}
+  {m === 4 && (
+    <g>
+      <rect x="170" y="140" width="320" height="90" rx="22" fill="#FFFFFF" />
+      <rect x="200" y="172" width="200" height="12" rx="6" fill="#5B6B7A" opacity=".5" />
+      <rect x="200" y="196" width="140" height="12" rx="6" fill="#5B6B7A" opacity=".3" />
+      <rect x="310" y="260" width="320" height="90" rx="22" fill="#003152" />
+      <rect x="340" y="292" width="220" height="12" rx="6" fill="#ADDFF1" />
+      <rect x="340" y="316" width="160" height="12" rx="6" fill="#ADDFF1" opacity=".6" />
+      <rect x="170" y="380" width="240" height="70" rx="22" fill="#FFFFFF" />
+      <circle cx="220" cy="415" r="7" fill="#2C7FA8" /><circle cx="248" cy="415" r="7" fill="#2C7FA8" opacity=".6" /><circle cx="276" cy="415" r="7" fill="#2C7FA8" opacity=".3" />
+    </g>
+  )}
+  {m === 5 && (
+    <g fill="#003152">
+      <path d="M400 110 560 270H470L400 200 330 270H240z" />
+      <path d="M400 250 560 410H470L400 340 330 410H240z" opacity=".55" />
+      <path d="M400 390 560 550H470L400 480 330 550H240z" opacity=".25" />
+    </g>
+  )}
+</svg>
+
+<style>
+  .pv { width: 100%; height: 100%; display: block; }
+</style>

@@ -1,0 +1,107 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import ProjectVisual from '../components/ProjectVisual.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import LiteVideo from '../components/LiteVideo.astro';
+import CTA from '../components/CTA.astro';
+import { projects, projectPath, type Project } from '../data/projects';
+import { serviceById, servicePath } from '../data/services';
+import { routes, useT, otherLang, type Lang } from '../i18n/ui';
+
+interface Props { lang: Lang; project: Project }
+const { lang, project: p } = Astro.props;
+const t = useT(lang);
+const service = serviceById(p.service);
+const idx = projects.indexOf(p);
+const next = [projects[(idx + 1) % projects.length], projects[(idx + 2) % projects.length]];
+---
+<Layout
+  lang={lang}
+  title={p.title[lang]}
+  description={`${p.context[lang]} ${p.outcome[lang]}`}
+  altHref={projectPath(p, otherLang(lang))}
+  current="work"
+  noindex={p.example}
+>
+  <header class="ph container">
+    <a class="back small" href={routes.work[lang]}><Icon name="chevron" size={14} class="flip" /> {t('work.back')}</a>
+    <p class="eyebrow in">{service.title[lang]}</p>
+    <h1 class="t-1 in" style="--d:.08s">{p.title[lang]}</h1>
+    <dl class="meta in" style="--d:.16s">
+      <div><dt>{t('work.client')}</dt><dd>{p.client[lang]}</dd></div>
+      <div><dt>{t('work.service')}</dt><dd><a class="text-link" href={servicePath(service, lang)}>{service.title[lang]}</a></dd></div>
+      <div><dt>{t('work.result')}</dt><dd>{p.result[lang]}</dd></div>
+    </dl>
+  </header>
+
+  <div class="container">
+    <div class="cover in" style="--d:.2s">
+      {p.cover ? <img src={p.cover} alt={p.title[lang]} width="1600" height="900" /> : <ProjectVisual motif={p.motif} />}
+      {p.example && <span class="badge cover-badge">{t('work.example')}</span>}
+    </div>
+  </div>
+
+  <section class="section-tight">
+    <div class="container story">
+      <div class="story-row" data-reveal>
+        <h2 class="t-3">{t('work.context')}</h2>
+        <p class="lead">{p.context[lang]}</p>
+      </div>
+      <div class="story-row" data-reveal>
+        <h2 class="t-3">{t('work.done')}</h2>
+        <ul class="list-k lead">{p.done[lang].map((d) => <li>{d}</li>)}</ul>
+      </div>
+      <div class="story-row" data-reveal>
+        <h2 class="t-3">{t('work.outcome')}</h2>
+        <p class="t-3 display outcome">{p.outcome[lang]}</p>
+      </div>
+    </div>
+  </section>
+
+  {p.youtube && (
+    <section class="section-tight" aria-label={t('work.visuals')}>
+      <div class="container"><LiteVideo id={p.youtube} title={p.title[lang]} /></div>
+    </section>
+  )}
+
+  <section class="section bg-soft" aria-labelledby="more-title">
+    <div class="container">
+      <h2 id="more-title" class="t-2 more-title" data-reveal>{t('home.work.all')}</h2>
+      <div class="more">
+        {next.map((n, i) => <ProjectCard project={n} lang={lang} delay={i * 100} />)}
+      </div>
+    </div>
+  </section>
+
+  <CTA lang={lang} href={`${routes.contact[lang]}?service=${p.service}`} />
+</Layout>
+
+<style>
+  .ph { padding-top: clamp(28px, 4vw, 48px); padding-bottom: clamp(40px, 6vw, 72px); }
+  .back { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 44px; color: var(--muted); text-decoration: none; margin-bottom: clamp(24px, 5vw, 56px); }
+  .back:hover { color: var(--night); }
+  .back :global(.flip) { transform: rotate(180deg); }
+  .ph h1 { max-width: 18ch; }
+  .meta { display: grid; gap: 1.25rem; margin: 2.5rem 0 0; }
+  .meta dt { font-size: 0.875rem; font-weight: 500; color: var(--muted); margin-bottom: 0.2rem; }
+  .meta dd { margin: 0; color: var(--night); font-weight: 500; }
+  @media (min-width: 720px) { .meta { grid-template-columns: repeat(3, 1fr); gap: 2rem; } }
+
+  .cover { position: relative; aspect-ratio: 16 / 9; border-radius: var(--radius); overflow: hidden; background: var(--soft); }
+  .cover img, .cover :global(svg) { width: 100%; height: 100%; object-fit: cover; }
+  .cover-badge { position: absolute; top: 16px; left: 16px; }
+
+  .story { display: grid; gap: clamp(48px, 7vw, 96px); padding-top: clamp(24px, 4vw, 48px); }
+  .story-row { display: grid; gap: 1rem 4rem; }
+  .story-row .lead { color: var(--ink); }
+  .outcome { margin: 0; color: var(--night); max-width: 22ch; }
+  @media (min-width: 960px) { .story-row { grid-template-columns: 4fr 8fr; } }
+
+  .in { animation: ph 1s var(--ease) both; animation-delay: var(--d, 0s); }
+  @keyframes ph { from { opacity: 0; transform: translate3d(0, 20px, 0); } }
+
+  .more-title { margin-bottom: clamp(32px, 5vw, 56px); }
+  .more { display: grid; gap: 40px 24px; }
+  @media (min-width: 720px) { .more { grid-template-columns: 1fr 1fr; } }
+</style>

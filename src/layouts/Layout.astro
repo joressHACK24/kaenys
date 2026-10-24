@@ -1,0 +1,99 @@
+---
+import '@fontsource/poppins/latin-400.css';
+import '@fontsource/poppins/latin-500.css';
+import '@fontsource/poppins/latin-600.css';
+import '@fontsource/poppins/latin-700.css';
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import { useT, otherLang, type Lang, type RouteKey } from '../i18n/ui';
+import { SITE } from '../config';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  /** Chemin de la même page dans l'autre langue. */
+  altHref: string;
+  current?: RouteKey;
+  /** Message WhatsApp prérempli propre à la page. */
+  waMessage?: string;
+  jsonLd?: Record<string, unknown>[];
+  noindex?: boolean;
+}
+
+const { lang, title, description, altHref, current, waMessage, jsonLd = [], noindex = false } = Astro.props;
+const t = useT(lang);
+const other = otherLang(lang);
+const canonical = new URL(Astro.url.pathname, SITE.url).href;
+const alternate = new URL(altHref, SITE.url).href;
+const fullTitle = title.includes('Kaenys') ? title : `${title} · Kaenys`;
+const ogImage = new URL('/og.png', SITE.url).href;
+
+const org = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  '@id': `${SITE.url}/#org`,
+  name: 'Kaenys',
+  url: SITE.url,
+  logo: new URL('/favicon.svg', SITE.url).href,
+  image: ogImage,
+  email: SITE.email,
+  telephone: SITE.phone,
+  areaServed: ['Cameroun', 'Afrique francophone'],
+  address: { '@type': 'PostalAddress', addressLocality: SITE.city, addressCountry: SITE.country },
+  sameAs: Object.values(SITE.social),
+};
+---
+<!doctype html>
+<html lang={lang === 'fr' ? 'fr-CM' : 'en'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang={lang === 'fr' ? 'fr' : 'en'} href={canonical} />
+    <link rel="alternate" hreflang={other} href={alternate} />
+    <link rel="alternate" hreflang="x-default" href={lang === 'fr' ? canonical : alternate} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#003152" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Kaenys" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={t('meta.locale')} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    <script type="application/ld+json" set:html={JSON.stringify([org, ...jsonLd])} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t('nav.skip')}</a>
+    <Nav lang={lang} altHref={altHref} current={current} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} altHref={altHref} />
+    <WhatsAppButton label={t('wa.label')} message={waMessage ?? t('wa.message')} />
+
+    <script>
+      import '../scripts/reveal';
+    </script>
+    {SITE.cfAnalyticsToken && (
+      <script
+        is:inline
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={JSON.stringify({ token: SITE.cfAnalyticsToken })}
+      />
+    )}
+  </body>
+</html>

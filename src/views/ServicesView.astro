@@ -1,0 +1,91 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Icon from '../components/Icon.astro';
+import CTA from '../components/CTA.astro';
+import { services, servicePath } from '../data/services';
+import { routes, useT, type Lang } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const seo = {
+  fr: { title: 'Services : design, community management, vidéo, web, IA et formation', description: 'Les six services de Kaenys à Douala : identité visuelle, community management, montage vidéo, développement web et applications, solutions d’IA et formation.' },
+  en: { title: 'Services: design, social media, video, web, AI and training', description: 'Kaenys’ six services in Douala: brand identity, social media management, video editing, web and app development, AI solutions and training.' },
+}[lang];
+---
+<Layout lang={lang} title={seo.title} description={seo.description} altHref={routes.services[lang === 'fr' ? 'en' : 'fr']} current="services">
+  <PageHeader eyebrow={t('services.eyebrow')} title={t('services.title')} lead={t('services.lead')} />
+
+  <section class="section-tight" aria-label={t('services.eyebrow')}>
+    <div class="container">
+      <ol class="srv-list">
+        {services.map((s, i) => (
+          <li data-reveal>
+            <a class="srv" href={servicePath(s, lang)}>
+              <span class="srv-n">0{i + 1}</span>
+              <span class="srv-icon"><Icon name={s.icon} size={30} /></span>
+              <span class="srv-main">
+                <h2 class="t-3">{s.title[lang]}</h2>
+                <p class="muted">{s.short[lang]}</p>
+              </span>
+              <span class="srv-meta">
+                <span class="small muted">{t('service.delay')}</span>
+                <span>{s.delay[lang]}</span>
+              </span>
+              <span class="srv-go" aria-hidden="true"><Icon name="arrow" size={22} /></span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <CTA lang={lang} />
+</Layout>
+
+<style>
+  .srv-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .srv-list li { border-bottom: 1px solid var(--line); }
+  .srv {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1rem 1.5rem;
+    padding: 2rem 0;
+    text-decoration: none;
+    color: inherit;
+  }
+  .srv-n { display: none; }
+  .srv-icon {
+    display: grid; place-items: center;
+    width: 60px; height: 60px;
+    border-radius: 12px;
+    background: var(--highlight);
+    color: var(--night);
+    transition: background-color 0.4s var(--ease), color 0.4s var(--ease);
+  }
+  .srv-main p { margin: 0.4rem 0 0; font-size: 1rem; }
+  .srv-meta { display: none; }
+  .srv-go {
+    display: grid; place-items: center;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1.5px var(--line-strong);
+    color: var(--night);
+    transition: background-color 0.4s var(--ease), color 0.4s var(--ease), transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+  }
+  .srv:hover .srv-icon { background: var(--night); color: var(--white); }
+  .srv:hover .srv-go { background: var(--night); color: var(--white); box-shadow: none; transform: translateX(4px); }
+  .srv:hover h2 { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; }
+
+  @media (max-width: 599px) {
+    .srv { grid-template-columns: auto 1fr; }
+    .srv-go { display: none; }
+  }
+  @media (min-width: 960px) {
+    .srv { grid-template-columns: 56px auto 1fr 220px auto; gap: 2rem; padding: 2.5rem 0; }
+    .srv-n { display: block; font-family: var(--font-display); font-weight: 600; color: var(--blue); font-size: 1.25rem; }
+    .srv-meta { display: grid; gap: 0.2rem; font-size: 1rem; }
+  }
+</style>

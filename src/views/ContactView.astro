@@ -1,0 +1,77 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import QuoteForm from '../components/QuoteForm.astro';
+import Icon from '../components/Icon.astro';
+import { routes, useT, type Lang } from '../i18n/ui';
+import { SITE, whatsappLink } from '../config';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const seo = {
+  fr: { title: 'Contact et devis : parlons de votre projet', description: 'Demandez un devis gratuit à Kaenys, agence digitale à Douala. Réponse sous 48 h ouvrées. WhatsApp, e-mail ou téléphone.' },
+  en: { title: 'Contact and quote: let’s talk about your project', description: 'Request a free quote from Kaenys, digital agency in Douala. Reply within 48 business hours. WhatsApp, email or phone.' },
+}[lang];
+---
+<Layout lang={lang} title={seo.title} description={seo.description} altHref={routes.contact[lang === 'fr' ? 'en' : 'fr']} current="contact">
+  <PageHeader eyebrow={t('contact.eyebrow')} title={t('contact.title')} lead={t('contact.lead')} />
+
+  <section class="section-tight contact">
+    <div class="container grid">
+      <div class="form-col" data-reveal>
+        <QuoteForm lang={lang} />
+      </div>
+
+      <aside class="side" data-reveal style="--delay:100ms">
+        <h2 class="t-4">{t('contact.direct')}</h2>
+        <ul class="direct">
+          <li>
+            <a href={whatsappLink(t('wa.message'))} target="_blank" rel="noopener">
+              <span class="d-icon"><Icon name="whatsapp" /></span>
+              <span><strong>{t('contact.whatsapp')}</strong><span class="muted">{SITE.phone}</span></span>
+            </a>
+          </li>
+          <li>
+            <a href={`mailto:${SITE.email}`}>
+              <span class="d-icon"><Icon name="mail" /></span>
+              <span><strong>{t('contact.email')}</strong><span class="muted">{SITE.email}</span></span>
+            </a>
+          </li>
+          <li>
+            <a href={`tel:${SITE.phone.replace(/\s/g, '')}`}>
+              <span class="d-icon"><Icon name="phone" /></span>
+              <span><strong>{t('contact.call')}</strong><span class="muted">{SITE.phone}</span></span>
+            </a>
+          </li>
+          <li class="static">
+            <span class="d-icon"><Icon name="pin" /></span>
+            <span><strong>Kaenys</strong><span class="muted">{t('footer.location')}</span></span>
+          </li>
+        </ul>
+
+        <div class="callout join">
+          <h2 class="t-4">{t('contact.join.title')}</h2>
+          <p>{t('contact.join.text')}</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .contact { padding-bottom: var(--section-pad); }
+  .grid { display: grid; gap: 4rem; }
+  @media (min-width: 1024px) { .grid { grid-template-columns: 7fr 4fr; gap: 5rem; align-items: start; } .side { position: sticky; top: calc(var(--nav-h) + 32px); } }
+  .side h2 { margin-bottom: 1.25rem; }
+  .direct { list-style: none; margin: 0 0 2rem; padding: 0; border-top: 1px solid var(--line); }
+  .direct li { border-bottom: 1px solid var(--line); }
+  .direct a, .direct .static { display: flex; align-items: center; gap: 1rem; padding: 1rem 0; text-decoration: none; color: inherit; }
+  .direct a:hover strong { text-decoration: underline; text-underline-offset: 3px; }
+  .direct strong { display: block; color: var(--night); font-weight: 600; }
+  .direct .muted { font-size: 0.9375rem; word-break: break-word; }
+  .d-icon { flex-shrink: 0; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 12px; background: var(--highlight); color: var(--night); transition: background-color 0.3s, color 0.3s; }
+  .direct a:hover .d-icon { background: var(--night); color: var(--white); }
+  .join h2 { margin-bottom: 0.5rem; }
+  .join p { font-size: 1rem; }
+</style>

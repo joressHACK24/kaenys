@@ -1,0 +1,26 @@
+---
+// Racine : redirige vers la langue du navigateur (français par défaut).
+---
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kaenys</title>
+    <link rel="canonical" href="https://kaenys.com/fr/" />
+    <link rel="alternate" hreflang="fr" href="https://kaenys.com/fr/" />
+    <link rel="alternate" hreflang="en" href="https://kaenys.com/en/" />
+    <link rel="alternate" hreflang="x-default" href="https://kaenys.com/fr/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#003152" />
+    <script is:inline>
+      var l = (navigator.languages && navigator.languages[0]) || navigator.language || 'fr';
+      location.replace(/^en/i.test(l) ? '/en/' : '/fr/');
+    </script>
+    <noscript><meta http-equiv="refresh" content="0; url=/fr/" /></noscript>
+    <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#003152;color:#fff;font-family:system-ui,sans-serif}a{color:#ADDFF1}</style>
+  </head>
+  <body>
+    <p><a href="/fr/">Français</a> · <a href="/en/">English</a></p>
+  </body>
+</html>

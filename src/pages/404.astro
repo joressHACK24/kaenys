@@ -1,0 +1,56 @@
+---
+import '@fontsource/poppins/latin-400.css';
+import '@fontsource/poppins/latin-600.css';
+import '@fontsource/poppins/latin-700.css';
+import '../styles/global.css';
+import Logo from '../components/Logo.astro';
+import { ui } from '../i18n/ui';
+---
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Page introuvable · Kaenys</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#003152" />
+  </head>
+  <body class="bg-night nf">
+    <main class="container">
+      <a href="/fr/" class="nf-logo" aria-label="Kaenys"><Logo tone="light" /></a>
+      <div class="nf-grid">
+        <section lang="fr">
+          <p class="eyebrow">404</p>
+          <h1 class="t-2">{ui.fr['404.title']}</h1>
+          <p class="lead">{ui.fr['404.text']}</p>
+          <div class="actions">
+            <a class="btn btn-light" href="/fr/">{ui.fr['404.home']}</a>
+            <a class="link-arrow" href="/fr/contact/">{ui.fr['nav.contact']}</a>
+          </div>
+        </section>
+        <section lang="en">
+          <p class="eyebrow">404</p>
+          <h2 class="t-2">{ui.en['404.title']}</h2>
+          <p class="lead">{ui.en['404.text']}</p>
+          <div class="actions">
+            <a class="btn btn-light" href="/en/">{ui.en['404.home']}</a>
+            <a class="link-arrow" href="/en/contact/">{ui.en['nav.contact']}</a>
+          </div>
+        </section>
+      </div>
+      <svg class="nf-chev" viewBox="0 0 234 118" aria-hidden="true"><path d="M115 0 234 117H167L115 65 64 117H0Z" /></svg>
+    </main>
+  </body>
+</html>
+
+<style>
+  .nf { min-height: 100vh; min-height: 100svh; overflow: hidden; }
+  .nf main { position: relative; padding-top: 32px; padding-bottom: 64px; }
+  .nf-logo { display: block; height: 26px; margin-bottom: clamp(64px, 14vh, 160px); }
+  .nf-grid { position: relative; z-index: 1; display: grid; gap: 4rem; }
+  .nf-grid .lead { margin: 1.25rem 0 2rem; max-width: 34ch; }
+  @media (min-width: 900px) { .nf-grid { grid-template-columns: 1fr 1fr; } }
+  .nf-chev { position: absolute; right: -10%; bottom: -120px; width: min(70vw, 640px); fill: rgba(173, 223, 241, 0.08); animation: up 8s ease-in-out infinite; }
+  @keyframes up { 50% { transform: translate3d(0, -24px, 0); } }
+</style>

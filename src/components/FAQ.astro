@@ -1,0 +1,48 @@
+---
+interface Props { items: { q: string; a: string }[] }
+const { items } = Astro.props;
+---
+<div class="faq">
+  {items.map((it) => (
+    <details class="faq-item">
+      <summary>
+        <span>{it.q}</span>
+        <svg class="faq-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+      </summary>
+      <div class="faq-a"><p>{it.a}</p></div>
+    </details>
+  ))}
+</div>
+
+<style>
+  .faq { border-top: 1px solid var(--line); }
+  .faq-item { border-bottom: 1px solid var(--line); }
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    min-height: 64px;
+    padding: 1.1rem 0;
+    cursor: pointer;
+    list-style: none;
+    font-size: clamp(1.0625rem, 1.6vw, 1.25rem);
+    font-weight: 500;
+    color: var(--night);
+  }
+  summary::-webkit-details-marker { display: none; }
+  .faq-icon {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    transition: transform 0.4s var(--ease);
+  }
+  details[open] .faq-icon { transform: rotate(45deg); }
+  .faq-a { padding: 0 3rem 1.5rem 0; color: var(--muted); }
+  details[open] .faq-a { animation: faq 0.45s var(--ease); }
+  @keyframes faq { from { opacity: 0; transform: translate3d(0, -6px, 0); } }
+</style>

@@ -1,0 +1,83 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Icon from '../components/Icon.astro';
+import CTA from '../components/CTA.astro';
+import { plans, formatFCFA } from '../data/pricing';
+import { serviceById, servicePath } from '../data/services';
+import { routes, useT, type Lang } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const seo = {
+  fr: { title: 'Tarifs : nos formules à partir de', description: 'Les tarifs de départ de Kaenys pour le design, le community management, la vidéo, le web, l’IA et la formation. Devis gratuit sous 48 h ouvrées.' },
+  en: { title: 'Pricing: our starting packages', description: 'Kaenys starting prices for design, social media, video, web, AI and training. Free quote within 48 business hours.' },
+}[lang];
+---
+<Layout lang={lang} title={seo.title} description={seo.description} altHref={routes.pricing[lang === 'fr' ? 'en' : 'fr']} current="pricing">
+  <PageHeader eyebrow={t('pricing.eyebrow')} title={t('pricing.title')} lead={t('pricing.lead')} />
+
+  <section class="section-tight" aria-label={t('pricing.eyebrow')}>
+    <div class="container">
+      <ul class="plans">
+        {plans.map((p, i) => {
+          const s = serviceById(p.service);
+          return (
+            <li class="plan" data-reveal style={`--delay:${(i % 3) * 80}ms`}>
+              <div class="plan-top">
+                <span class="plan-icon"><Icon name={s.icon} size={24} /></span>
+                <a class="plan-service small" href={servicePath(s, lang)}>{s.title[lang]}</a>
+              </div>
+              <h2 class="t-3">{p.name[lang]}</h2>
+              <p class="plan-price">
+                {p.from ? (
+                  <>
+                    <span class="from">{t('pricing.from')}</span>
+                    <span class="amount display">{formatFCFA(p.from, lang)}</span>
+                    {p.unit && <span class="unit">{p.unit[lang]}</span>}
+                  </>
+                ) : (
+                  <span class="amount display">{t('pricing.onQuote')}</span>
+                )}
+              </p>
+              <ul class="list-k">{p.features[lang].map((f) => <li>{f}</li>)}</ul>
+              <a class="btn btn-ghost plan-cta" href={`${routes.contact[lang]}?service=${p.service}`}>{t('pricing.cta')}</a>
+            </li>
+          );
+        })}
+      </ul>
+      <p class="note muted small" data-reveal>{t('pricing.note')}</p>
+    </div>
+  </section>
+
+  <CTA lang={lang} />
+</Layout>
+
+<style>
+  .plans { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+  @media (min-width: 720px) { .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; } }
+  @media (min-width: 1100px) { .plans { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+  .plan {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(28px, 3vw, 40px);
+    border-radius: var(--radius);
+    background: var(--white);
+    box-shadow: 0 0 0 1px var(--line);
+    transition: box-shadow 0.4s var(--ease), transform 0.4s var(--ease);
+  }
+  .plan:hover { box-shadow: 0 0 0 1.5px var(--night); }
+  .plan-top { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.75rem; }
+  .plan-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--highlight); color: var(--night); }
+  .plan-service { color: var(--muted); text-decoration: none; }
+  .plan-service:hover { color: var(--night); text-decoration: underline; }
+  .plan-price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.5rem; margin: 1rem 0 1.75rem; padding-bottom: 1.75rem; border-bottom: 1px solid var(--line); }
+  .from { width: 100%; font-size: 0.875rem; font-weight: 500; color: var(--muted); }
+  .amount { font-size: clamp(1.75rem, 3vw, 2.25rem); color: var(--night); letter-spacing: -0.03em; }
+  .unit { color: var(--muted); font-size: 0.9375rem; }
+  .plan .list-k { margin-bottom: 2rem; font-size: 1rem; }
+  .plan-cta { margin-top: auto; align-self: flex-start; }
+  .note { margin-top: 2rem; text-align: center; }
+</style>

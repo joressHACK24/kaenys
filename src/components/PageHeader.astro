@@ -1,0 +1,20 @@
+---
+interface Props { eyebrow: string; title: string; lead?: string; center?: boolean }
+const { eyebrow, title, lead, center = true } = Astro.props;
+---
+<header class:list={['page-header container', { center }]}>
+  <p class="eyebrow ph-in">{eyebrow}</p>
+  <h1 class="t-1 ph-in" style="--d:.08s">{title}</h1>
+  {lead && <p class="lead ph-in" style="--d:.16s">{lead}</p>}
+  <slot />
+</header>
+
+<style>
+  .page-header { padding-top: clamp(64px, 10vw, 136px); padding-bottom: clamp(48px, 7vw, 96px); }
+  .page-header h1 { max-width: 18ch; }
+  .page-header .lead { margin-top: 1.5rem; max-width: 40ch; }
+  .center { text-align: center; }
+  .center h1, .center .lead { margin-inline: auto; }
+  .ph-in { animation: ph 1s var(--ease) both; animation-delay: var(--d, 0s); }
+  @keyframes ph { from { opacity: 0; transform: translate3d(0, 20px, 0); } }
+</style>

@@ -1,0 +1,169 @@
+---
+import { SYMBOL_PARTS } from '../data/logo';
+import Icon from './Icon.astro';
+import { routes, useT, type Lang } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+---
+<section class="hero bg-night" data-hero aria-labelledby="hero-title">
+  <div class="hero-pin">
+    <div class="hero-copy container" data-hero-copy>
+      <h1 id="hero-title" class="t-hero hero-title">{t('hero.title')}</h1>
+      <p class="lead hero-sub">{t('hero.sub')}</p>
+      <div class="actions center hero-actions">
+        <a class="btn btn-light btn-lg" href={routes.contact[lang]}>{t('hero.cta')}</a>
+        <a class="link-arrow" href={routes.work[lang]}>{t('hero.secondary')} <Icon name="chevron" /></a>
+      </div>
+    </div>
+
+    <div class="hero-stage" aria-hidden="true" data-hero-stage>
+      <div class="hero-fallback" data-hero-fallback>
+        <svg class="hero-symbol" viewBox="0 0 240 249">
+          {SYMBOL_PARTS.map((d, i) => <path d={d} style={`--i:${i}`} />)}
+        </svg>
+      </div>
+    </div>
+    <canvas class="hero-canvas" aria-hidden="true" data-hero-canvas></canvas>
+  </div>
+</section>
+
+<script>
+  const hero = document.querySelector<HTMLElement>('[data-hero]')!;
+  const canvas = hero.querySelector<HTMLCanvasElement>('[data-hero-canvas]')!;
+  const copy = hero.querySelector<HTMLElement>('[data-hero-copy]')!;
+
+  // Le texte s'efface doucement pendant que le symbole prend la scène.
+  const onScroll = () => {
+    const r = hero.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - window.innerHeight)));
+    copy.style.setProperty('--p', p.toFixed(3));
+  };
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  const nav = navigator as Navigator & { connection?: { saveData?: boolean }; deviceMemory?: number };
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const saveData = nav.connection?.saveData === true;
+  const lowMemory = typeof nav.deviceMemory === 'number' && nav.deviceMemory < 2;
+  // WebGL avec une vraie carte graphique uniquement : un rendu logiciel (SwiftShader, llvmpipe)
+  // ferait ramer les téléphones d'entrée de gamme.
+  const hasGPU = (() => {
+    try {
+      const gl = document.createElement('canvas').getContext('webgl');
+      if (!gl) return false;
+      const ext = gl.getExtension('WEBGL_debug_renderer_info');
+      const renderer = ext ? String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)) : '';
+      return !/swiftshader|llvmpipe|software|basic render/i.test(renderer);
+    } catch { return false; }
+  })();
+
+  // ?3d=1 force la 3D (tests sur machine sans carte graphique).
+  const force = new URLSearchParams(location.search).has('3d');
+  if (force || (hasGPU && !reduced && !saveData && !lowMemory)) {
+    // Le symbole s'affiche d'abord en SVG (animation CSS légère). La 3D ne se charge qu'au premier
+    // geste du visiteur : rien ne ralentit l'ouverture de la page.
+    const events = ['pointermove', 'pointerdown', 'scroll', 'keydown', 'touchstart'] as const;
+    let booted = false;
+    const boot = () => {
+      if (booted) return;
+      booted = true;
+      events.forEach((e) => window.removeEventListener(e, boot));
+      import('../scripts/hero3d').then(({ initHero3D }) =>
+        initHero3D({
+          canvas,
+          scrollTarget: hero,
+          stage: hero.querySelector<HTMLElement>('[data-hero-stage]')!,
+          onReady: () => hero.classList.add('is-3d'),
+        }),
+      );
+    };
+    events.forEach((e) => window.addEventListener(e, boot, { passive: true, once: true }));
+  }
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    height: 170vh;
+    height: 170svh;
+    margin-top: calc(var(--nav-h) * -1);
+  }
+  .hero-pin {
+    position: sticky;
+    isolation: isolate;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-top: calc(var(--nav-h) + clamp(40px, 8vh, 96px));
+  }
+
+  .hero-copy {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    --p: 0;
+    opacity: calc(1 - var(--p) * 1.8);
+    transform: translate3d(0, calc(var(--p) * -60px), 0) scale(calc(1 - var(--p) * 0.06));
+  }
+  .hero-title { max-width: 14ch; margin-inline: auto; }
+  .hero-sub { margin: 1.25rem auto 0; max-width: 34ch; }
+  .hero-actions { margin-top: 2rem; }
+
+  .hero-title, .hero-sub, .hero-actions { animation: rise 1.1s var(--ease) both; }
+  .hero-sub { animation-delay: 0.12s; }
+  .hero-actions { animation-delay: 0.24s; }
+  @keyframes rise { from { opacity: 0; transform: translate3d(0, 24px, 0); } }
+
+  .hero-stage {
+    position: relative;
+    flex: 1;
+    min-height: 260px;
+    margin-top: clamp(8px, 3vh, 32px);
+  }
+  .hero-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1.2s var(--ease);
+  }
+  .hero-fallback {
+    position: absolute;
+    inset: 4% 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.6s var(--ease);
+  }
+  .hero-symbol {
+    height: 100%;
+    max-width: 80%;
+    width: auto;
+    overflow: visible;
+  }
+  .hero-symbol path {
+    fill: var(--sky);
+    animation: assemble 1.6s var(--ease) both;
+    animation-delay: calc(0.35s + var(--i) * 0.12s);
+  }
+  .hero-symbol path:nth-child(1) { --from: translate(60px, -70px) rotate(25deg); }
+  .hero-symbol path:nth-child(2) { --from: translate(-80px, 20px) rotate(-18deg); }
+  .hero-symbol path:nth-child(3) { --from: translate(40px, 80px) rotate(14deg); }
+  @keyframes assemble { from { opacity: 0; transform: var(--from); } }
+
+  :global(.hero.is-3d) .hero-canvas { opacity: 1; }
+  :global(.hero.is-3d) .hero-fallback { opacity: 0; }
+
+  @media (max-width: 639px) {
+    .hero { height: 150vh; height: 150svh; }
+  }
+</style>

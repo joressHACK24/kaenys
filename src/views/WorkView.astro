@@ -1,0 +1,116 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import CTA from '../components/CTA.astro';
+import { projects } from '../data/projects';
+import { services } from '../data/services';
+import { routes, useT, type Lang } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const used = services.filter((s) => projects.some((p) => p.service === s.id));
+const seo = {
+  fr: { title: 'Réalisations : nos projets au Cameroun', description: 'Portfolio de Kaenys : identités visuelles, vidéos, sites web, réseaux sociaux, solutions d’IA et formations réalisés pour nos clients au Cameroun.' },
+  en: { title: 'Work: our projects in Cameroon', description: 'Kaenys portfolio: brand identities, videos, websites, social media, AI solutions and training delivered for our clients in Cameroon.' },
+}[lang];
+---
+<Layout lang={lang} title={seo.title} description={seo.description} altHref={routes.work[lang === 'fr' ? 'en' : 'fr']} current="work">
+  <PageHeader eyebrow={t('work.eyebrow')} title={t('work.title')} lead={t('work.lead')} />
+
+  <section class="section-tight work" aria-label={t('work.eyebrow')} data-work>
+    <div class="container">
+      <div class="filters-wrap">
+        <div class="filters" role="group" aria-label={t('work.filter')} data-filters hidden>
+          <button type="button" aria-pressed="true" data-filter="all">{t('work.all')}</button>
+          {used.map((s) => <button type="button" aria-pressed="false" data-filter={s.id}>{s.title[lang]}</button>)}
+        </div>
+      </div>
+
+      <div class="grid" data-grid>
+        {projects.map((p, i) => <ProjectCard project={p} lang={lang} delay={(i % 3) * 80} level={2} />)}
+      </div>
+      <p class="empty muted" hidden data-empty>{t('work.empty')}</p>
+      <p class="sr-only" aria-live="polite" data-live></p>
+    </div>
+  </section>
+
+  <CTA lang={lang} />
+</Layout>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-work]');
+  if (root) {
+    const bar = root.querySelector<HTMLElement>('[data-filters]')!;
+    const buttons = [...bar.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-service]')];
+    const empty = root.querySelector<HTMLElement>('[data-empty]')!;
+    const live = root.querySelector<HTMLElement>('[data-live]')!;
+    bar.hidden = false;
+
+    const apply = (f: string) => {
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === f)));
+      let n = 0;
+      cards.forEach((c) => {
+        const show = f === 'all' || c.dataset.service === f;
+        c.hidden = !show;
+        if (show) { n++; c.classList.remove('is-in'); requestAnimationFrame(() => c.classList.add('is-in')); }
+      });
+      empty.hidden = n > 0;
+      live.textContent = String(n);
+      const url = new URL(location.href);
+      if (f === 'all') url.searchParams.delete('service'); else url.searchParams.set('service', f);
+      history.replaceState(null, '', url);
+    };
+
+    buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.filter!)));
+    const initial = new URLSearchParams(location.search).get('service');
+    if (initial && buttons.some((b) => b.dataset.filter === initial)) apply(initial);
+  }
+</script>
+
+<style>
+  .filters-wrap {
+    margin: 0 calc(var(--gutter) * -1) clamp(32px, 5vw, 56px);
+    padding: 0 var(--gutter);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .filters-wrap::-webkit-scrollbar { display: none; }
+  .filters {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 12px;
+    background: var(--soft);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .filters[hidden] { display: none; }
+  .filters button {
+    flex-shrink: 0;
+    min-height: 40px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.3s var(--ease), color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+  }
+  .filters button:hover { color: var(--night); }
+  .filters button[aria-pressed='true'] {
+    background: var(--white);
+    color: var(--night);
+    box-shadow: 0 1px 3px rgba(0, 49, 82, 0.12), 0 0 0 1px var(--line);
+  }
+
+  .grid { display: grid; gap: 48px 24px; }
+  .grid > :global([hidden]) { display: none; }
+  @media (min-width: 720px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1100px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .empty { text-align: center; padding: 3rem 0; }
+</style>
