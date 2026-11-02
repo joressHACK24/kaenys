@@ -30,10 +30,11 @@ npm run preview   # sert dist/ en local
 
 - [ ] **Logo** : remplacer le tracé provisoire (`src/data/logo.ts`, `public/favicon.svg`, `public/logo-kaenys.svg`) par les SVG officiels.
 - [ ] **Police Unigo** : vérifier la licence web, déposer `public/fonts/unigo.woff2`, puis décommenter le bloc `@font-face` en haut de `src/styles/global.css`. En attendant, les titres sont en Poppins.
-- [ ] **Coordonnées** : numéro WhatsApp, téléphone et liens des réseaux dans `src/config.ts`.
+- [x] **Coordonnées** : WhatsApp +237 698 47 96 49, appels +237 697 53 52 63.
+- [ ] **Réseaux sociaux** : vérifier les liens Instagram, Facebook et LinkedIn dans `src/config.ts`.
 - [ ] **Tarifs** : renseigner les montants `from` dans `src/data/pricing.ts` (affiche « Sur devis » tant qu'ils sont vides).
-- [ ] **Réalisations** : les 6 projets actuels sont des **exemples de mise en page** (badge « Exemple », non indexés par Google). Les remplacer par des études de cas réelles avec accord écrit des clients (Art. 11 et 13 du pacte). Images en WebP dans `public/work/`, champ `cover`. Vidéos : identifiant YouTube dans le champ `youtube` (lecture au clic uniquement).
-- [ ] **Équipe** : photos en WebP dans `public/team/`, champ `photo` dans `src/views/AboutView.astro`.
+- [ ] **Réalisations** : les 6 projets actuels sont des **exemples de mise en page** (badge « Exemple », non indexés par Google). Les remplacer par des études de cas réelles avec accord écrit des clients (Art. 11 et 13 du pacte). Mode d'emploi pas à pas : **[GUIDE-REALISATIONS.md](GUIDE-REALISATIONS.md)** (compression des images avec `npm run images`).
+- [ ] **Équipe** : photo de Joress en place ; photo de Bryan à ajouter (`public/team/bryan.webp`, champ `photo` dans `src/views/AboutView.astro`).
 - [ ] **Textes** : relire et valider tous les textes FR et EN proposés (services, délais, à propos).
 - [ ] **Pages légales** : compléter les crochets `[...]` et faire relire par un professionnel.
 - [ ] **Formulaire** : créer un compte Resend (gratuit), vérifier le domaine kaenys.com, puis ajouter dans Cloudflare Pages les variables `RESEND_API_KEY` (secret), `MAIL_FROM` (ex. `Kaenys <site@kaenys.com>`) et `MAIL_TO` (`contact@kaenys.com`).
@@ -52,7 +53,7 @@ Le dossier `functions/` contient la fonction serveur du formulaire de devis (`/a
 ## Choix de conception
 
 - **Style** : inspiré d'Apple — grande typographie, beaucoup d'espace, sections alternées blanc / bleu nuit, barre de navigation translucide, aucun emoji, aucun dégradé. Uniquement les 8 couleurs de la charte.
-- **3D** : le symbole « K » en relief dans l'en-tête de l'accueil. Il s'assemble d'abord en SVG (animation CSS), puis la version 3D (three.js, ~140 Ko compressés) ne se charge qu'au premier geste du visiteur et seulement si l'appareil a une carte graphique. Elle est désactivée en mode économie de données et pour les visiteurs qui ont demandé moins d'animations. Ajouter `?3d=1` à l'adresse force la 3D pour les tests.
+- **3D** : le symbole « K » en relief, en arrière-plan semi-transparent de l'en-tête de l'accueil ; il devient pleinement visible quand le texte s'efface au défilement. Il s'assemble d'abord en SVG (animation CSS), puis la version 3D (three.js, ~140 Ko compressés) ne se charge qu'au premier geste du visiteur et seulement si l'appareil a une carte graphique. Elle est désactivée en mode économie de données et pour les visiteurs qui ont demandé moins d'animations. Ajouter `?3d=1` à l'adresse force la 3D pour les tests.
 - **Animations** : apparitions au défilement, section « Comment on travaille » qui suit le défilement, survols. Toutes respectent le réglage « réduire les animations ».
 - **Accessibilité** : le bleu Kaenys (#2C7FA8) a un contraste de 4,46:1 sur blanc, juste sous le seuil de 4,5:1 de la charte. Il n'est donc utilisé que pour les textes grands et gras (19 px gras minimum) et les éléments graphiques. Les liens dans le texte sont en bleu nuit, soulignés en bleu Kaenys.
 - **Formulaire** : erreurs et succès dans les bleus de la charte, avec icône et texte, jamais par la couleur seule.

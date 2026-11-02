@@ -1,0 +1,3 @@
+Déposez ici les images originales des réalisations, une sous-dossier par projet,
+puis lancez : npm run images
+Ce dossier n’est pas envoyé sur GitHub.

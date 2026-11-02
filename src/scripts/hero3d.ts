@@ -116,8 +116,8 @@ export function initHero3D({ canvas, scrollTarget, stage, onReady }: Hero3DOptio
   window.addEventListener('scroll', readScroll, { passive: true });
   readScroll();
 
-  // Au repos, le symbole tient dans la zone « stage » sous le texte ; en fin de défilement,
-  // il remonte au centre de l'écran et grandit pendant que le texte s'efface.
+  // Au repos, le symbole remplit la zone « stage », en arrière-plan du texte ; au défilement,
+  // il pivote et se resserre légèrement pendant que le texte s'efface.
   const SYMBOL_H = 260;
   const layout = { restY: 0, restScale: 1, endScale: 1.4 };
   const resize = () => {
@@ -135,7 +135,7 @@ export function initHero3D({ canvas, scrollTarget, stage, onReady }: Hero3DOptio
     layout.restY = (h / 2 - stageMid) * pxToWorld;
     const fit = Math.min((st.height * 0.92 * pxToWorld) / SYMBOL_H, (worldW * 0.8) / SYMBOL_H);
     layout.restScale = Math.max(0.35, fit);
-    layout.endScale = Math.min((worldH * 0.48) / SYMBOL_H, (worldW * 0.7) / SYMBOL_H);
+    layout.endScale = layout.restScale * 0.82;
   };
   const ro = new ResizeObserver(resize);
   ro.observe(canvas);

@@ -8,3 +8,7 @@ dist/
 # Livrables locaux (aperçus et archive)
 apercu-*.png
 kaenys-site.zip
+
+# Images originales (lourdes) : seules les versions compressées de public/work/ sont publiées
+images-a-optimiser/*
+!images-a-optimiser/LISEZ-MOI.txt

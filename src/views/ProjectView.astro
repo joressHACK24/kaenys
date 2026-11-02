@@ -59,9 +59,19 @@ const next = [projects[(idx + 1) % projects.length], projects[(idx + 2) % projec
     </div>
   </section>
 
-  {p.youtube && (
-    <section class="section-tight" aria-label={t('work.visuals')}>
-      <div class="container"><LiteVideo id={p.youtube} title={p.title[lang]} /></div>
+  {(p.youtube || p.gallery?.length) && (
+    <section class="section-tight" aria-labelledby="visuals-title">
+      <div class="container">
+        <h2 id="visuals-title" class="t-2 more-title" data-reveal>{t('work.visuals')}</h2>
+        {p.youtube && <div class="video" data-reveal><LiteVideo id={p.youtube} title={p.title[lang]} /></div>}
+        {p.gallery && (
+          <div class="gallery">
+            {p.gallery.map((src, i) => (
+              <img src={src} alt={`${p.title[lang]} (${i + 1})`} loading="lazy" decoding="async" data-reveal style={`--delay:${(i % 2) * 80}ms`} />
+            ))}
+          </div>
+        )}
+      </div>
     </section>
   )}
 
@@ -100,6 +110,14 @@ const next = [projects[(idx + 1) % projects.length], projects[(idx + 2) % projec
 
   .in { animation: ph 1s var(--ease) both; animation-delay: var(--d, 0s); }
   @keyframes ph { from { opacity: 0; transform: translate3d(0, 20px, 0); } }
+
+  .video { margin-bottom: 24px; }
+  .gallery { display: grid; gap: 24px; }
+  .gallery img { width: 100%; height: auto; border-radius: var(--radius); background: var(--soft); }
+  @media (min-width: 720px) {
+    .gallery { grid-template-columns: 1fr 1fr; }
+    .gallery img:first-child:nth-last-child(odd) { grid-column: 1 / -1; }
+  }
 
   .more-title { margin-bottom: clamp(32px, 5vw, 56px); }
   .more { display: grid; gap: 40px 24px; }

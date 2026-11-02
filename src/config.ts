@@ -3,10 +3,11 @@ export const SITE = {
   name: 'Kaenys',
   url: 'https://kaenys.com',
   email: 'contact@kaenys.com',
-  // TODO: numéro WhatsApp Business au format international, sans + ni espaces (ex. 2376XXXXXXXX)
-  whatsapp: '237600000000',
-  // TODO: numéro d'appel affiché
-  phone: '+237 6 00 00 00 00',
+  // Numéro WhatsApp au format international, sans + ni espaces
+  whatsapp: '237698479649',
+  whatsappDisplay: '+237 698 47 96 49',
+  // Numéro pour appeler
+  phone: '+237 697 53 52 63',
   city: 'Douala',
   country: 'CM',
   social: {

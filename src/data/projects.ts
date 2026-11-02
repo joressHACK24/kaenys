@@ -19,6 +19,8 @@ export interface Project {
   outcome: L<string>;
   /** Image de couverture (WebP dans /public/work/) ; sinon un visuel de remplacement est dessiné. */
   cover?: string;
+  /** Autres visuels affichés sur la page du projet. */
+  gallery?: string[];
   /** Identifiant de vidéo YouTube facultatif, lue à la demande. */
   youtube?: string;
   /** Motif du visuel de remplacement (0 à 5). */
