@@ -34,7 +34,7 @@ npm run preview   # sert dist/ en local
 - [ ] **Réseaux sociaux** : vérifier les liens Instagram, Facebook et LinkedIn dans `src/config.ts`.
 - [ ] **Tarifs** : renseigner les montants `from` dans `src/data/pricing.ts` (affiche « Sur devis » tant qu'ils sont vides).
 - [ ] **Réalisations** : les 6 projets actuels sont des **exemples de mise en page** (badge « Exemple », non indexés par Google). Les remplacer par des études de cas réelles avec accord écrit des clients (Art. 11 et 13 du pacte). Mode d'emploi pas à pas : **[GUIDE-REALISATIONS.md](GUIDE-REALISATIONS.md)** (compression des images avec `npm run images`).
-- [ ] **Équipe** : photo de Joress en place ; photo de Bryan à ajouter (`public/team/bryan.webp`, champ `photo` dans `src/views/AboutView.astro`).
+- [ ] **Équipe** : photo de Bryan en place ; photo de Joress à ajouter (`public/team/joress.webp`, champ `photo` dans `src/views/AboutView.astro`).
 - [ ] **Textes** : relire et valider tous les textes FR et EN proposés (services, délais, à propos).
 - [ ] **Pages légales** : compléter les crochets `[...]` et faire relire par un professionnel.
 - [ ] **Formulaire** : créer un compte Resend (gratuit), vérifier le domaine kaenys.com, puis ajouter dans Cloudflare Pages les variables `RESEND_API_KEY` (secret), `MAIL_FROM` (ex. `Kaenys <site@kaenys.com>`) et `MAIL_TO` (`contact@kaenys.com`).
