@@ -116,7 +116,7 @@ export const ui = {
 
     'about.eyebrow': 'À propos',
     'about.title': 'Une agence jeune. Exigeante sur la qualité.',
-    'about.lead': 'Une agence digitale fondée par deux associés, l’un à Douala, l’autre en Allemagne, qui accompagne des clients depuis 2025, au Cameroun et en Afrique francophone.',
+    'about.lead': 'Une agence digitale fondée par deux associés, l’un à Douala, l’autre en Allemagne, qui accompagne des clients depuis 2025, au Cameroun et auprès de la diaspora en Europe.',
     'about.story.title': 'Notre histoire',
     'about.team.title': 'L’équipe',
     'about.values.title': 'Nos valeurs',
@@ -298,7 +298,7 @@ export const ui = {
 
     'about.eyebrow': 'About',
     'about.title': 'A young agency. Serious about quality.',
-    'about.lead': 'A digital agency founded by two partners, one in Douala and one in Germany, working with clients since 2025, in Cameroon and across French-speaking Africa.',
+    'about.lead': 'A digital agency founded by two partners, one in Douala and one in Germany, working with clients since 2025, in Cameroon and with the diaspora in Europe.',
     'about.story.title': 'Our story',
     'about.team.title': 'The team',
     'about.values.title': 'Our values',
