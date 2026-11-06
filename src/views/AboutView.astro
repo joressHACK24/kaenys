@@ -13,8 +13,8 @@ const t = useT(lang);
 const c = {
   fr: {
     story: [
-      'Kaenys prend la suite de Jolin. Le nom change, l’exigence reste : aider les entreprises et les particuliers à exister et à grandir grâce au numérique.',
-      'Nous sommes une équipe jeune, basée à Douala. Nous réunissons le design, la vidéo, le web, l’intelligence artificielle et la formation pour que nos clients n’aient qu’un seul interlocuteur.',
+      'Kaenys est une agence digitale fondée par deux associés, l’un à Douala, l’autre en Allemagne. Depuis 2025, nous aidons nos clients à exister et à grandir grâce au numérique.',
+      'Nous sommes une équipe jeune, entre Douala et l’Allemagne. Nous réunissons le design, la vidéo, le web, l’intelligence artificielle et la formation pour que nos clients n’aient qu’un seul interlocuteur.',
       'Notre symbole, un « K » en forme de flèche montante, dit ce que nous voulons pour chaque client : de la progression et de l’élan.',
     ],
     team: [
@@ -32,8 +32,8 @@ const c = {
   },
   en: {
     story: [
-      'Kaenys is the successor to Jolin. The name has changed, the standards have not: helping businesses and individuals stand out and grow through digital.',
-      'We are a young team based in Douala. We bring together design, video, web, artificial intelligence and training so our clients only need one point of contact.',
+      'Kaenys is a digital agency founded by two partners, one in Douala and one in Germany. Since 2025, we have been helping our clients stand out and grow through digital.',
+      'We are a young team, between Douala and Germany. We bring together design, video, web, artificial intelligence and training so our clients only need one point of contact.',
       'Our symbol, a “K” shaped like a rising arrow, says what we want for every client: progress and momentum.',
     ],
     team: [
@@ -52,8 +52,8 @@ const c = {
 }[lang];
 
 const seo = {
-  fr: { title: 'À propos : l’équipe Kaenys à Douala', description: 'Kaenys, successeur de Jolin, est une agence digitale jeune et exigeante basée à Douala. Découvrez notre histoire, notre équipe et nos valeurs.' },
-  en: { title: 'About: the Kaenys team in Douala', description: 'Kaenys, successor to Jolin, is a young and demanding digital agency based in Douala. Discover our story, our team and our values.' },
+  fr: { title: 'À propos : l’équipe Kaenys à Douala', description: 'Kaenys est une agence digitale fondée par deux associés, à Douala et en Allemagne. Découvrez notre histoire, notre équipe et nos valeurs.' },
+  en: { title: 'About: the Kaenys team in Douala', description: 'Kaenys is a digital agency founded by two partners, in Douala and in Germany. Discover our story, our team and our values.' },
 }[lang];
 ---
 <Layout lang={lang} title={seo.title} description={seo.description} altHref={routes.about[lang === 'fr' ? 'en' : 'fr']} current="about">
