@@ -19,20 +19,28 @@ import {
 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
-type Pt = [number, number];
+import { SYMBOL_HEAD, SYMBOL_BAR, SYMBOL_CHEVRON, SYMBOL_SIZE } from '../data/logo';
 
-// Coordonnées issues du tracé du logo (repère SVG 240 × 249, y vers le bas).
-const BAR: Pt[] = [[149, 3], [223, 0.8], [1.1, 221.5], [3.2, 150.7]];
-const CHEVRON: Pt[] = [[121.7, 131], [239, 247.5], [172.4, 247.8], [121.9, 196.1], [71.5, 247.8], [6.5, 247.5]];
-const HEAD = { x: 40.9, y: 38.2, r: 36.5 };
-const CENTER: Pt = [120, 124];
+// Vecteurs officiels du symbole (repère SVG, y vers le bas), centrés sur l'origine.
+const CENTER = [SYMBOL_SIZE.width / 2, SYMBOL_SIZE.height / 2];
+const X = (x: number) => x - CENTER[0];
+const Y = (y: number) => CENTER[1] - y;
 
-const toShape = (pts: Pt[]) => {
-  const s = new Shape();
-  pts.forEach(([x, y], i) => (i ? s.lineTo(x - CENTER[0], CENTER[1] - y) : s.moveTo(x - CENTER[0], CENTER[1] - y)));
-  s.closePath();
-  return s;
-};
+/** Convertit un tracé SVG absolu (commandes M, L, C, Z) en forme three.js. */
+function pathToShape(d: string) {
+  const shape = new Shape();
+  const tokens = d.match(/[MLCZ]|-?\d*\.?\d+/g) ?? [];
+  let cmd = '';
+  const n = () => Number(tokens.shift());
+  while (tokens.length) {
+    if (/[MLCZ]/.test(tokens[0]!)) cmd = tokens.shift()!;
+    if (cmd === 'M') shape.moveTo(X(n()), Y(n()));
+    else if (cmd === 'L') shape.lineTo(X(n()), Y(n()));
+    else if (cmd === 'C') shape.bezierCurveTo(X(n()), Y(n()), X(n()), Y(n()), X(n()), Y(n()));
+    else if (cmd === 'Z') shape.closePath();
+  }
+  return shape;
+}
 
 const easeOutExpo = (t: number) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -79,12 +87,14 @@ export function initHero3D({ canvas, scrollTarget, stage, onReady }: Hero3DOptio
     envMapIntensity: 0.65,
   });
 
-  const extrude = { depth: 38, bevelEnabled: true, bevelThickness: 6, bevelSize: 4, bevelSegments: 6, curveSegments: 48 };
+  // Biseau léger : il élargit un peu chaque pièce, sans refermer les espaces entre elles.
+  const extrude = { depth: 38, bevelEnabled: true, bevelThickness: 4, bevelSize: 2, bevelSegments: 6, curveSegments: 48 };
 
   const headShape = new Shape();
-  headShape.absarc(HEAD.x - CENTER[0], CENTER[1] - HEAD.y, HEAD.r - 4, 0, Math.PI * 2, false);
+  const { cx, cy, rx, ry } = SYMBOL_HEAD;
+  headShape.absellipse(X(cx), Y(cy), rx - extrude.bevelSize, ry - extrude.bevelSize, 0, Math.PI * 2, false, 0);
 
-  const pieces = [headShape, toShape(BAR), toShape(CHEVRON)].map((shape) => {
+  const pieces = [headShape, pathToShape(SYMBOL_BAR), pathToShape(SYMBOL_CHEVRON)].map((shape) => {
     const geo = new ExtrudeGeometry(shape, extrude);
     geo.translate(0, 0, -extrude.depth / 2);
     return new Mesh(geo, material);
@@ -111,7 +121,7 @@ export function initHero3D({ canvas, scrollTarget, stage, onReady }: Hero3DOptio
 
   // Au repos, le symbole remplit la zone « stage », en arrière-plan du texte ; au défilement,
   // il rejoint le centre de l'écran pendant que le texte s'efface.
-  const SYMBOL_H = 260;
+  const SYMBOL_H = SYMBOL_SIZE.height + 10;
   const layout = { restX: 0, restY: 0, restScale: 1, endScale: 1.4 };
   const resize = () => {
     const { clientWidth: w, clientHeight: h } = canvas;

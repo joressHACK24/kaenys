@@ -95,7 +95,7 @@ const seo = {
     const apply = (f: string) => {
       buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === f)));
       let n = 0;
-      cards.forEach((c, i) => {
+      cards.forEach((c) => {
         const show = f === 'all' || c.dataset.categories!.split(' ').includes(f);
         c.hidden = !show;
         if (show) {

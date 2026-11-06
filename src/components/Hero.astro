@@ -1,5 +1,5 @@
 ---
-import { SYMBOL_PARTS } from '../data/logo';
+import { SYMBOL_PARTS, SYMBOL_VIEWBOX } from '../data/logo';
 import Icon from './Icon.astro';
 import { routes, useT, type Lang } from '../i18n/ui';
 
@@ -21,7 +21,7 @@ const t = useT(lang);
     <div class="hero-art" aria-hidden="true">
       <div class="hero-stage" data-hero-stage>
         <div class="hero-fallback">
-          <svg class="hero-symbol" viewBox="0 0 240 249">
+          <svg class="hero-symbol" viewBox={SYMBOL_VIEWBOX}>
             {SYMBOL_PARTS.map((d, i) => <path d={d} style={`--i:${i}`} />)}
           </svg>
         </div>
