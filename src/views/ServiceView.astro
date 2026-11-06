@@ -6,7 +6,7 @@ import CTA from '../components/CTA.astro';
 import ServiceTiles from '../components/ServiceTiles.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import { servicePath, type Service } from '../data/services';
-import { projects } from '../data/projects';
+import { projects, categoryServices } from '../data/projects';
 import { plans, formatFCFA } from '../data/pricing';
 import { routes, useT, otherLang, type Lang } from '../i18n/ui';
 import { SITE } from '../config';
@@ -15,7 +15,7 @@ interface Props { lang: Lang; service: Service }
 const { lang, service: s } = Astro.props;
 const t = useT(lang);
 const quoteHref = `${routes.contact[lang]}?service=${s.id}`;
-const related = projects.filter((p) => p.service === s.id).slice(0, 2);
+const related = projects.filter((p) => p.categories.some((c) => categoryServices[c].includes(s.id))).slice(0, 2);
 const plan = plans.find((p) => p.service === s.id);
 const waMessage = `${t('wa.serviceMessage')}${s.title[lang]}`;
 const place = lang === 'fr' ? 'Douala, Cameroun' : 'Douala, Cameroon';
@@ -99,7 +99,7 @@ const jsonLd = [
       <div class="container">
         <h2 id="rel-title" class="t-2 block-title" data-reveal>{t('service.work')}</h2>
         <div class="rel-grid">
-          {related.map((p, i) => <ProjectCard project={p} lang={lang} delay={i * 100} />)}
+          {related.map((p, i) => <ProjectCard project={p} lang={lang} delay={i * 100} sizes="(min-width: 720px) 50vw, 100vw" />)}
         </div>
       </div>
     </section>

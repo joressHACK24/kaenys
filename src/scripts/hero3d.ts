@@ -90,13 +90,6 @@ export function initHero3D({ canvas, scrollTarget, stage, onReady }: Hero3DOptio
     return new Mesh(geo, material);
   });
 
-  // Légère dispersion des pièces au défilement.
-  const spread = [
-    { x: -18, y: 22, z: 50 },
-    { x: 0, y: 0, z: -16 },
-    { x: 14, y: -22, z: 34 },
-  ];
-
   const group = new Group();
   pieces.forEach((m) => group.add(m));
   scene.add(group);
@@ -117,9 +110,9 @@ export function initHero3D({ canvas, scrollTarget, stage, onReady }: Hero3DOptio
   readScroll();
 
   // Au repos, le symbole remplit la zone « stage », en arrière-plan du texte ; au défilement,
-  // il pivote et se resserre légèrement pendant que le texte s'efface.
+  // il rejoint le centre de l'écran pendant que le texte s'efface.
   const SYMBOL_H = 260;
-  const layout = { restY: 0, restScale: 1, endScale: 1.4 };
+  const layout = { restX: 0, restY: 0, restScale: 1, endScale: 1.4 };
   const resize = () => {
     const { clientWidth: w, clientHeight: h } = canvas;
     if (!w || !h) return;
@@ -127,15 +120,16 @@ export function initHero3D({ canvas, scrollTarget, stage, onReady }: Hero3DOptio
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     const worldH = 2 * Math.tan((camera.fov * Math.PI) / 360) * camera.position.z;
-    const worldW = worldH * camera.aspect;
     const pxToWorld = worldH / h;
     const c = canvas.getBoundingClientRect();
     const st = stage.getBoundingClientRect();
-    const stageMid = st.top - c.top + st.height / 2;
-    layout.restY = (h / 2 - stageMid) * pxToWorld;
-    const fit = Math.min((st.height * 0.92 * pxToWorld) / SYMBOL_H, (worldW * 0.8) / SYMBOL_H);
+    const stageMidY = st.top - c.top + st.height / 2;
+    const stageMidX = st.left - c.left + st.width / 2;
+    layout.restY = (h / 2 - stageMidY) * pxToWorld;
+    layout.restX = (stageMidX - w / 2) * pxToWorld;
+    const fit = Math.min((st.height * 0.92 * pxToWorld) / SYMBOL_H, (st.width * 0.8 * pxToWorld) / SYMBOL_H);
     layout.restScale = Math.max(0.35, fit);
-    layout.endScale = layout.restScale * 0.82;
+    layout.endScale = layout.restScale * 1.08;
   };
   const ro = new ResizeObserver(resize);
   ro.observe(canvas);
@@ -154,15 +148,14 @@ export function initHero3D({ canvas, scrollTarget, stage, onReady }: Hero3DOptio
     const t = (now - start) / 1000;
     pointerEased.lerp(pointer, 0.06);
 
-    const k = scroll * scroll;
-    pieces.forEach((m, i) => m.position.set(spread[i].x * k, spread[i].y * k, spread[i].z * k));
-
     // Démarre à plat, comme le SVG qu'il remplace, puis prend vie.
     const w = easeOutExpo(clamp01(t / 2.4));
-    const idle = Math.sin(t * 0.5) * 0.18;
-    group.rotation.y = (idle + pointerEased.x * 0.35 - 0.25) * w + scroll * 0.8;
-    group.rotation.x = (pointerEased.y * 0.18 + Math.sin(t * 0.35) * 0.05) * w + scroll * 0.25;
+    const idle = Math.sin(t * 0.5) * 0.14;
+    // Mouvements doux et limités : la charte interdit d'incliner le logo ou d'en déplacer les éléments.
+    group.rotation.y = (idle + pointerEased.x * 0.3 - 0.2) * w + scroll * 0.3;
+    group.rotation.x = (pointerEased.y * 0.12 + Math.sin(t * 0.35) * 0.04) * w;
     const e = scroll * scroll * (3 - 2 * scroll);
+    group.position.x = lerp(layout.restX, 0, e);
     group.position.y = lerp(layout.restY, 0, e) + Math.sin(t * 0.8) * 4;
     group.scale.setScalar(lerp(layout.restScale, layout.endScale, e));
 

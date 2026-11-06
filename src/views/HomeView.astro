@@ -2,7 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import Hero from '../components/Hero.astro';
 import ServiceTiles from '../components/ServiceTiles.astro';
-import ProjectCard from '../components/ProjectCard.astro';
+import Marquee from '../components/Marquee.astro';
+import WorkStrip from '../components/WorkStrip.astro';
 import Process from '../components/Process.astro';
 import CTA from '../components/CTA.astro';
 import Icon from '../components/Icon.astro';
@@ -13,11 +14,12 @@ import { routes, useT, type Lang } from '../i18n/ui';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useT(lang);
-const featured = projects.slice(0, 4);
-const facts = [1, 2, 3, 4].map((n) => ({
-  value: t(`facts.${n}.value` as 'facts.1.value'),
-  label: t(`facts.${n}.label` as 'facts.1.label'),
-}));
+// Chiffres animés au défilement : on compte jusqu'à la partie numérique de la valeur (48 h, 6, 1).
+const facts = [1, 2, 3, 4].map((n) => {
+  const value = t(`facts.${n}.value` as 'facts.1.value');
+  const m = value.match(/^(\d+)(.*)$/);
+  return { value, label: t(`facts.${n}.label` as 'facts.1.label'), count: m?.[1], suffix: m?.[2] };
+});
 const seo = {
   fr: {
     title: 'Kaenys · Agence digitale à Douala : design, vidéo, web et IA',
@@ -32,47 +34,50 @@ const seo = {
 <Layout lang={lang} title={seo.title} description={seo.description} altHref={routes.home[lang === 'fr' ? 'en' : 'fr']} current="home">
   <Hero lang={lang} />
 
+  <Marquee lang={lang} />
+
   <section class="section" aria-labelledby="services-title">
     <div class="container">
       <div class="section-head" data-reveal>
         <p class="eyebrow">{t('home.services.eyebrow')}</p>
-        <h2 id="services-title" class="t-1">{t('home.services.title')}</h2>
+        <h2 id="services-title" class="t-1" data-split>{t('home.services.title')}</h2>
         <p class="lead">{t('home.services.lead')}</p>
       </div>
       <ServiceTiles lang={lang} />
     </div>
   </section>
 
-  <section class="section bg-soft" aria-labelledby="work-title">
-    <div class="container">
-      <div class="work-head" data-reveal>
-        <div>
-          <p class="eyebrow">{t('home.work.eyebrow')}</p>
-          <h2 id="work-title" class="t-1">{t('home.work.title')}</h2>
+  {projects.length > 0 && (
+    <section class="section bg-night work" aria-labelledby="work-title">
+      <div class="container">
+        <div class="work-head" data-reveal>
+          <div>
+            <p class="eyebrow">{t('home.work.eyebrow')}</p>
+            <h2 id="work-title" class="t-1" data-split>{t('home.work.title')}</h2>
+          </div>
+          <a class="link-arrow" href={routes.work[lang]}>{t('home.work.all')} <Icon name="chevron" /></a>
         </div>
-        <a class="link-arrow" href={routes.work[lang]}>{t('home.work.all')} <Icon name="chevron" /></a>
       </div>
-      <div class="work-grid">
-        {featured.map((p, i) => <ProjectCard project={p} lang={lang} delay={(i % 2) * 100} large={i === 0} />)}
-      </div>
-    </div>
-  </section>
+      <WorkStrip lang={lang} />
+    </section>
+  )}
 
-  <Process lang={lang} />
-
-  <section class="section" aria-labelledby="facts-title">
+  <section class="section bg-sky deco" aria-labelledby="facts-title">
+    <svg class="deco-chev" style="left:-8%;bottom:-10%;color:var(--white);opacity:.45" viewBox="0 0 234 118" aria-hidden="true" data-parallax="0.18"><path d="M115 0 234 117H167L115 65 64 117H0Z" /></svg>
     <div class="container">
-      <h2 id="facts-title" class="t-2 facts-title" data-reveal>{t('home.facts.title')}</h2>
+      <h2 id="facts-title" class="t-2 facts-title" data-split>{t('home.facts.title')}</h2>
       <dl class="facts">
         {facts.map((f, i) => (
           <div class="fact" data-reveal style={`--delay:${i * 90}ms`}>
-            <dt class="fact-value display">{f.value}</dt>
+            <dt class="fact-value display" data-count={f.count} data-suffix={f.suffix}>{f.value}</dt>
             <dd class="fact-label">{f.label}</dd>
           </div>
         ))}
       </dl>
     </div>
   </section>
+
+  <Process lang={lang} />
 
   {testimonials.length > 0 && (
     <section class="section bg-soft" aria-labelledby="testi-title">
@@ -103,20 +108,17 @@ const seo = {
     margin-bottom: clamp(40px, 6vw, 72px);
   }
   .work-head h2 { max-width: 14ch; }
-  .work-grid { display: grid; gap: 48px 24px; }
-  @media (min-width: 720px) {
-    .work-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .work-grid > :global(.large) { grid-column: 1 / -1; }
-  }
+  .work { overflow: hidden; }
 
   .facts-title { max-width: 16ch; margin-bottom: clamp(40px, 6vw, 72px); }
-  .facts { display: grid; gap: 0; margin: 0; border-top: 1px solid var(--line); }
-  .fact { padding: 2rem 0; border-bottom: 1px solid var(--line); }
+  .facts { display: grid; gap: 0; margin: 0; border-top: 1px solid rgba(0, 49, 82, 0.2); }
+  .fact { padding: 2rem 0; border-bottom: 1px solid rgba(0, 49, 82, 0.2); }
   .fact-value { font-size: clamp(3rem, 7vw, 5rem); line-height: 1; letter-spacing: -0.04em; }
-  .fact-label { margin: 0.75rem 0 0; color: var(--muted); max-width: 24ch; }
+  .fact-label { margin: 0.75rem 0 0; color: var(--night); max-width: 24ch; }
+  .fact-value { font-variant-numeric: tabular-nums; }
   @media (min-width: 720px) {
     .facts { grid-template-columns: repeat(2, 1fr); border-top: 0; }
-    .fact { border-bottom: 0; border-top: 1px solid var(--line); padding-right: 2rem; }
+    .fact { border-bottom: 0; border-top: 1px solid rgba(0, 49, 82, 0.2); padding-right: 2rem; }
   }
   @media (min-width: 1100px) { .facts { grid-template-columns: repeat(4, 1fr); } }
 

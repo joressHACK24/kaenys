@@ -2,7 +2,8 @@
 //
 // 1. Déposez vos images (JPG, PNG, WebP, TIFF) dans images-a-optimiser/<nom-du-projet>/
 // 2. Lancez : npm run images
-// 3. Les versions légères (WebP, 1600 px de large maximum) sont créées dans public/work/<nom-du-projet>/
+// 3. Les versions légères (WebP, 1600 px de large maximum) sont créées dans src/assets/realisations/<nom-du-projet>/
+//    Le site en fabrique ensuite automatiquement des tailles adaptées à chaque écran.
 //
 // Les originaux ne sont pas modifiés et ne sont pas envoyés sur GitHub.
 import { readdir, mkdir, stat } from 'node:fs/promises';
@@ -10,7 +11,7 @@ import { join, parse } from 'node:path';
 import sharp from 'sharp';
 
 const SRC = 'images-a-optimiser';
-const OUT = 'public/work';
+const OUT = 'src/assets/realisations';
 const MAX_WIDTH = 1600;
 const QUALITY = 78;
 const EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff']);
@@ -47,7 +48,7 @@ for await (const file of files(SRC)) {
   before += size;
   after += info.size;
   count++;
-  console.log(`${rel}  ${kb(size)} -> ${kb(info.size)}   /${outFile.replace(/^public\//, '').replace(/\\/g, '/')}`);
+  console.log(`${rel}  ${kb(size)} -> ${kb(info.size)}   ${outFile.slice(OUT.length + 1).replace(/\\/g, '/')}`);
 }
 
 if (!count) console.log(`Aucune image trouvée dans ${SRC}/. Déposez vos images dans ${SRC}/<nom-du-projet>/ puis relancez.`);

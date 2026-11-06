@@ -1,125 +1,239 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Icon from '../components/Icon.astro';
-import ProjectVisual from '../components/ProjectVisual.astro';
+import WorkImage from '../components/WorkImage.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import LiteVideo from '../components/LiteVideo.astro';
 import CTA from '../components/CTA.astro';
-import { projects, projectPath, type Project } from '../data/projects';
-import { serviceById, servicePath } from '../data/services';
+import { projects, projectPath, categories, loadImage, type Project } from '../data/projects';
 import { routes, useT, otherLang, type Lang } from '../i18n/ui';
+import { SITE } from '../config';
 
 interface Props { lang: Lang; project: Project }
 const { lang, project: p } = Astro.props;
 const t = useT(lang);
-const service = serviceById(p.service);
 const idx = projects.indexOf(p);
-const next = [projects[(idx + 1) % projects.length], projects[(idx + 2) % projects.length]];
+const others = projects.length > 1
+  ? [1, 2].map((k) => projects[(idx + k) % projects.length]).filter((o, i, a) => o !== p && a.indexOf(o) === i)
+  : [];
+const sizes = await Promise.all(p.images.map((i) => loadImage(i.file)));
+const cats = p.categories.map((c) => categories[c][lang]).join(' · ');
+
+const jsonLd = [{
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: `${p.client} · ${cats}`,
+  description: p.description[lang],
+  creator: { '@id': `${SITE.url}/#org` },
+  url: new URL(projectPath(p, lang), SITE.url).href,
+}];
 ---
 <Layout
   lang={lang}
-  title={p.title[lang]}
-  description={`${p.context[lang]} ${p.outcome[lang]}`}
+  title={`${p.client} · ${t('nav.work')}`}
+  description={`${p.client} (${p.sector[lang]}) : ${p.description[lang]}`}
   altHref={projectPath(p, otherLang(lang))}
   current="work"
-  noindex={p.example}
+  noindex={!p.authorized}
+  jsonLd={jsonLd}
 >
   <header class="ph container">
     <a class="back small" href={routes.work[lang]}><Icon name="chevron" size={14} class="flip" /> {t('work.back')}</a>
-    <p class="eyebrow in">{service.title[lang]}</p>
-    <h1 class="t-1 in" style="--d:.08s">{p.title[lang]}</h1>
-    <dl class="meta in" style="--d:.16s">
-      <div><dt>{t('work.client')}</dt><dd>{p.client[lang]}</dd></div>
-      <div><dt>{t('work.service')}</dt><dd><a class="text-link" href={servicePath(service, lang)}>{service.title[lang]}</a></dd></div>
-      <div><dt>{t('work.result')}</dt><dd>{p.result[lang]}</dd></div>
-    </dl>
+    <div class="ph-grid">
+      <div>
+        <p class="eyebrow in">{cats}</p>
+        <h1 class="t-1 in" style="--d:.08s">{p.client}</h1>
+        <p class="lead in" style="--d:.16s">{p.description[lang]}</p>
+        {!p.authorized && <p class="in" style="--d:.2s"><span class="badge">{t('work.pending')}</span></p>}
+      </div>
+      <dl class="meta in" style="--d:.24s">
+        <div><dt>{t('work.sector')}</dt><dd>{p.sector[lang]}</dd></div>
+        <div><dt>{t('work.place')}</dt><dd>{p.place[lang]}</dd></div>
+        <div><dt>{t('work.categories')}</dt><dd>{cats}</dd></div>
+      </dl>
+    </div>
   </header>
 
-  <div class="container">
-    <div class="cover in" style="--d:.2s">
-      {p.cover ? <img src={p.cover} alt={p.title[lang]} width="1600" height="900" /> : <ProjectVisual motif={p.motif} />}
-      {p.example && <span class="badge cover-badge">{t('work.example')}</span>}
-    </div>
-  </div>
-
-  <section class="section-tight">
-    <div class="container story">
-      <div class="story-row" data-reveal>
-        <h2 class="t-3">{t('work.context')}</h2>
-        <p class="lead">{p.context[lang]}</p>
-      </div>
-      <div class="story-row" data-reveal>
-        <h2 class="t-3">{t('work.done')}</h2>
-        <ul class="list-k lead">{p.done[lang].map((d) => <li>{d}</li>)}</ul>
-      </div>
-      <div class="story-row" data-reveal>
-        <h2 class="t-3">{t('work.outcome')}</h2>
-        <p class="t-3 display outcome">{p.outcome[lang]}</p>
-      </div>
+  <section class="gallery-section" aria-label={t('work.visuals')}>
+    <div class="container">
+      {p.youtube && <div class="video" data-reveal><LiteVideo id={p.youtube} title={p.client} /></div>}
+      <ul class="masonry" data-gallery>
+        {p.images.map((img, i) => (
+          <li data-reveal style={`--delay:${(i % 3) * 70}ms`}>
+            <button
+              type="button"
+              class="shot"
+              data-full={sizes[i].src}
+              data-w={sizes[i].width}
+              data-h={sizes[i].height}
+              data-alt={img.alt[lang]}
+              aria-label={`${t('work.open')} : ${img.alt[lang]}`}
+            >
+              <WorkImage
+                file={img.file}
+                alt={img.alt[lang]}
+                eager={i < 2}
+                sizes="(min-width: 1100px) 380px, (min-width: 640px) 50vw, 100vw"
+                widths={[360, 560, 800, 1200]}
+              />
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   </section>
 
-  {(p.youtube || p.gallery?.length) && (
-    <section class="section-tight" aria-labelledby="visuals-title">
+  <dialog class="lightbox" data-lightbox aria-label={t('work.visuals')}>
+    <img alt="" data-lb-img />
+    <p class="lb-count" data-lb-count aria-live="polite"></p>
+    <button type="button" class="lb-btn lb-close" data-lb-close aria-label={t('work.close')}><Icon name="close" /></button>
+    <button type="button" class="lb-btn lb-prev" data-lb-prev aria-label={t('work.prev')}><Icon name="chevron" class="flip" /></button>
+    <button type="button" class="lb-btn lb-next" data-lb-next aria-label={t('work.next')}><Icon name="chevron" /></button>
+  </dialog>
+
+  {others.length > 0 && (
+    <section class="section bg-soft" aria-labelledby="more-title">
       <div class="container">
-        <h2 id="visuals-title" class="t-2 more-title" data-reveal>{t('work.visuals')}</h2>
-        {p.youtube && <div class="video" data-reveal><LiteVideo id={p.youtube} title={p.title[lang]} /></div>}
-        {p.gallery && (
-          <div class="gallery">
-            {p.gallery.map((src, i) => (
-              <img src={src} alt={`${p.title[lang]} (${i + 1})`} loading="lazy" decoding="async" data-reveal style={`--delay:${(i % 2) * 80}ms`} />
-            ))}
-          </div>
-        )}
+        <div class="more-head" data-reveal>
+          <h2 id="more-title" class="t-2">{t('work.others')}</h2>
+          <a class="link-arrow" href={routes.work[lang]}>{t('home.work.all')} <Icon name="chevron" /></a>
+        </div>
+        <div class="more">
+          {others.map((n, i) => <ProjectCard project={n} lang={lang} delay={i * 100} sizes="(min-width: 720px) 50vw, 100vw" />)}
+        </div>
       </div>
     </section>
   )}
 
-  <section class="section bg-soft" aria-labelledby="more-title">
-    <div class="container">
-      <h2 id="more-title" class="t-2 more-title" data-reveal>{t('home.work.all')}</h2>
-      <div class="more">
-        {next.map((n, i) => <ProjectCard project={n} lang={lang} delay={i * 100} />)}
-      </div>
-    </div>
-  </section>
-
-  <CTA lang={lang} href={`${routes.contact[lang]}?service=${p.service}`} />
+  <CTA lang={lang} />
 </Layout>
+
+<script>
+  const gallery = document.querySelector<HTMLElement>('[data-gallery]');
+  const dialog = document.querySelector<HTMLDialogElement>('[data-lightbox]');
+  if (gallery && dialog && typeof dialog.showModal === 'function') {
+    const shots = [...gallery.querySelectorAll<HTMLButtonElement>('[data-full]')];
+    const img = dialog.querySelector<HTMLImageElement>('[data-lb-img]')!;
+    const count = dialog.querySelector<HTMLElement>('[data-lb-count]')!;
+    let i = 0;
+
+    const show = (n: number) => {
+      i = (n + shots.length) % shots.length;
+      const s = shots[i].dataset;
+      img.src = s.full!;
+      img.alt = s.alt!;
+      img.width = Number(s.w);
+      img.height = Number(s.h);
+      count.textContent = `${i + 1} / ${shots.length}`;
+      img.classList.remove('lb-in');
+      void img.offsetWidth;
+      img.classList.add('lb-in');
+    };
+
+    shots.forEach((b, n) => b.addEventListener('click', () => { show(n); dialog.showModal(); }));
+    dialog.querySelector('[data-lb-close]')!.addEventListener('click', () => dialog.close());
+    dialog.querySelector('[data-lb-prev]')!.addEventListener('click', () => show(i - 1));
+    dialog.querySelector('[data-lb-next]')!.addEventListener('click', () => show(i + 1));
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') show(i - 1);
+      if (e.key === 'ArrowRight') show(i + 1);
+    });
+    dialog.addEventListener('close', () => shots[i]?.focus());
+
+    let x0: number | null = null;
+    dialog.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+    dialog.addEventListener('touchend', (e) => {
+      if (x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 50) show(dx < 0 ? i + 1 : i - 1);
+      x0 = null;
+    });
+    if (shots.length < 2) dialog.querySelectorAll<HTMLElement>('.lb-prev, .lb-next').forEach((b) => (b.hidden = true));
+  }
+</script>
 
 <style>
   .ph { padding-top: clamp(28px, 4vw, 48px); padding-bottom: clamp(40px, 6vw, 72px); }
   .back { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 44px; color: var(--muted); text-decoration: none; margin-bottom: clamp(24px, 5vw, 56px); }
   .back:hover { color: var(--night); }
-  .back :global(.flip) { transform: rotate(180deg); }
-  .ph h1 { max-width: 18ch; }
-  .meta { display: grid; gap: 1.25rem; margin: 2.5rem 0 0; }
+  :global(.flip) { transform: rotate(180deg); }
+  .ph h1 { max-width: 16ch; }
+  .ph .lead { margin-top: 1.25rem; max-width: 46ch; color: var(--ink); }
+  .ph-grid { display: grid; gap: 2.5rem; align-items: end; }
+  .meta { display: grid; gap: 1.25rem; margin: 0; padding-top: 1.5rem; border-top: 1px solid var(--line); }
   .meta dt { font-size: 0.875rem; font-weight: 500; color: var(--muted); margin-bottom: 0.2rem; }
   .meta dd { margin: 0; color: var(--night); font-weight: 500; }
-  @media (min-width: 720px) { .meta { grid-template-columns: repeat(3, 1fr); gap: 2rem; } }
-
-  .cover { position: relative; aspect-ratio: 16 / 9; border-radius: var(--radius); overflow: hidden; background: var(--soft); }
-  .cover img, .cover :global(svg) { width: 100%; height: 100%; object-fit: cover; }
-  .cover-badge { position: absolute; top: 16px; left: 16px; }
-
-  .story { display: grid; gap: clamp(48px, 7vw, 96px); padding-top: clamp(24px, 4vw, 48px); }
-  .story-row { display: grid; gap: 1rem 4rem; }
-  .story-row .lead { color: var(--ink); }
-  .outcome { margin: 0; color: var(--night); max-width: 22ch; }
-  @media (min-width: 960px) { .story-row { grid-template-columns: 4fr 8fr; } }
+  @media (min-width: 960px) { .ph-grid { grid-template-columns: 7fr 4fr; gap: 4rem; } }
 
   .in { animation: ph 1s var(--ease) both; animation-delay: var(--d, 0s); }
   @keyframes ph { from { opacity: 0; transform: translate3d(0, 20px, 0); } }
 
+  .gallery-section { padding-bottom: var(--section-pad); }
   .video { margin-bottom: 24px; }
-  .gallery { display: grid; gap: 24px; }
-  .gallery img { width: 100%; height: auto; border-radius: var(--radius); background: var(--soft); }
-  @media (min-width: 720px) {
-    .gallery { grid-template-columns: 1fr 1fr; }
-    .gallery img:first-child:nth-last-child(odd) { grid-column: 1 / -1; }
+  .masonry { list-style: none; margin: 0; padding: 0; columns: 1; column-gap: 20px; }
+  @media (min-width: 640px) { .masonry { columns: 2; } }
+  @media (min-width: 1100px) { .masonry { columns: 3; } }
+  .masonry li { break-inside: avoid; margin-bottom: 20px; }
+  .shot {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--soft);
+    cursor: zoom-in;
   }
+  .shot :global(img) { width: 100%; height: auto; transition: transform 0.9s var(--ease); }
+  .shot:hover :global(img) { transform: scale(1.03); }
 
-  .more-title { margin-bottom: clamp(32px, 5vw, 56px); }
+  .lightbox {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--night);
+    color: var(--white);
+  }
+  .lightbox[open] { display: grid; place-items: center; }
+  .lightbox::backdrop { background: transparent; }
+  .lightbox img {
+    max-width: calc(100vw - 32px);
+    max-height: calc(100dvh - 120px);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+  }
+  .lightbox img:global(.lb-in) { animation: lb 0.5s var(--ease); }
+  @keyframes lb { from { opacity: 0; transform: scale(0.97); } }
+  .lb-count { position: absolute; bottom: 24px; left: 0; right: 0; text-align: center; margin: 0; font-size: 0.875rem; color: rgba(255, 255, 255, 0.72); }
+  .lb-btn {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--white);
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  .lb-btn:hover { background: rgba(255, 255, 255, 0.24); }
+  .lb-btn[hidden] { display: none; }
+  .lb-close { top: 16px; right: 16px; }
+  .lb-prev { left: 16px; top: 50%; transform: translateY(-50%); }
+  .lb-next { right: 16px; top: 50%; transform: translateY(-50%); }
+  @media (max-width: 639px) { .lb-prev, .lb-next { top: auto; bottom: 12px; transform: none; } }
+
+  .more-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1rem 2rem; margin-bottom: clamp(32px, 5vw, 56px); }
   .more { display: grid; gap: 40px 24px; }
   @media (min-width: 720px) { .more { grid-template-columns: 1fr 1fr; } }
 </style>

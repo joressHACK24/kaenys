@@ -11,7 +11,7 @@ const list = services.filter((s) => s.id !== exclude);
 <ul class="tiles">
   {list.map((s, i) => (
     <li data-reveal style={`--delay:${(i % 3) * 80}ms`}>
-      <a class="tile" href={servicePath(s, lang)}>
+      <a class="tile" href={servicePath(s, lang)} data-tilt>
         <span class="tile-icon"><Icon name={s.icon} size={28} /></span>
         <h3 class="t-4 tile-title">{s.title[lang]}</h3>
         <p class="tile-text">{s.short[lang]}</p>
@@ -60,7 +60,9 @@ const list = services.filter((s) => s.id !== exclude);
     border-radius: 12px;
     background: var(--highlight);
     color: var(--night);
+    transition: background-color 0.4s var(--ease), color 0.4s var(--ease), transform 0.5s var(--ease);
   }
+  .tile:hover .tile-icon { background: var(--night); color: var(--white); transform: rotate(-8deg) scale(1.08); }
   .tile-title { margin-top: 56px; }
   .tile-text { color: var(--muted); margin: 0.6rem 0 1.25rem; font-size: 1rem; }
   .tile-more {

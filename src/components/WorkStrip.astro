@@ -1,0 +1,73 @@
+---
+// Mur d'affiches : deux rangées de réalisations qui défilent en sens inverse.
+import WorkImage from './WorkImage.astro';
+import { projects, featuredProjects, projectPath } from '../data/projects';
+import type { Lang } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const ordered = [...featuredProjects, ...projects.filter((p) => !p.featured)];
+const covers = ordered.map((p) => ({ p, img: p.images.find((i) => i.file === p.cover) ?? p.images[0] }));
+const extras = ordered.flatMap((p) => p.images.filter((i) => i.file !== p.cover).slice(0, 2).map((img) => ({ p, img })));
+const rows = [covers, extras.length >= 4 ? extras : [...covers].reverse()];
+---
+{projects.length > 0 && (
+  <div class="strip" data-strip>
+    {rows.map((row, r) => (
+      <div class:list={['strip-row', { reverse: r === 1 }]}>
+        <div class="strip-track" style={`--dur:${row.length * 6}s`}>
+          {[0, 1].map((copy) => (
+            <ul class="strip-group" aria-hidden={copy === 1 ? 'true' : undefined}>
+              {row.map(({ p, img }) => (
+                <li>
+                  <a href={projectPath(p, lang)} tabindex={copy === 1 ? -1 : undefined} aria-label={copy === 1 ? undefined : p.client}>
+                    <WorkImage file={img.file} alt={copy === 1 ? '' : img.alt[lang]} sizes="(min-width: 960px) 300px, 210px" widths={[300, 600]} />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
+<script>
+  // Charge toutes les affiches dès que le mur approche : sinon celles qui arrivent par le côté apparaîtraient vides.
+  const strip = document.querySelector<HTMLElement>('[data-strip]');
+  if (strip && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      strip.querySelectorAll<HTMLImageElement>('img[loading="lazy"]').forEach((img) => (img.loading = 'eager'));
+      io.disconnect();
+    }, { rootMargin: '400px 0px' });
+    io.observe(strip);
+  }
+</script>
+
+<style>
+  .strip { display: grid; gap: 16px; overflow: hidden; padding: 4px 0; }
+  .strip-track { display: flex; width: max-content; animation: strip var(--dur, 60s) linear infinite; }
+  .reverse .strip-track { animation-direction: reverse; }
+  .strip:hover .strip-track { animation-play-state: paused; }
+  .strip-group { display: flex; gap: 16px; padding-right: 16px; list-style: none; margin: 0; }
+  .strip-group li { flex-shrink: 0; }
+  .strip a {
+    display: block;
+    height: clamp(210px, 26vw, 320px);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.06);
+    transition: transform 0.5s var(--ease);
+  }
+  .strip a:hover { transform: translateY(-6px) scale(1.02); }
+  .strip :global(img) { height: 100%; width: auto; display: block; }
+  @keyframes strip { to { transform: translate3d(-50%, 0, 0); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .strip-row { overflow-x: auto; }
+    .strip-track { animation: none; }
+  }
+</style>

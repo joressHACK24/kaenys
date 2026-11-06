@@ -2,76 +2,132 @@
 import Layout from '../layouts/Layout.astro';
 import PageHeader from '../components/PageHeader.astro';
 import ProjectCard from '../components/ProjectCard.astro';
+import WorkImage from '../components/WorkImage.astro';
 import CTA from '../components/CTA.astro';
-import { projects } from '../data/projects';
-import { services } from '../data/services';
+import { projects, logos, categories, type Category } from '../data/projects';
 import { routes, useT, type Lang } from '../i18n/ui';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useT(lang);
-const used = services.filter((s) => projects.some((p) => p.service === s.id));
+
+const used = (Object.keys(categories) as Category[]).filter(
+  (c) => projects.some((p) => p.categories.includes(c)) || (c === 'identity' && logos.length > 0),
+);
+const empty = projects.length === 0 && logos.length === 0;
+
 const seo = {
-  fr: { title: 'Réalisations : nos projets au Cameroun', description: 'Portfolio de Kaenys : identités visuelles, vidéos, sites web, réseaux sociaux, solutions d’IA et formations réalisés pour nos clients au Cameroun.' },
-  en: { title: 'Work: our projects in Cameroon', description: 'Kaenys portfolio: brand identities, videos, websites, social media, AI solutions and training delivered for our clients in Cameroon.' },
+  fr: { title: 'Réalisations : nos projets au Cameroun', description: 'Portfolio de Kaenys, agence digitale à Douala : affiches et réseaux sociaux, événementiel, community management et identités visuelles.' },
+  en: { title: 'Work: our projects in Cameroon', description: 'Portfolio of Kaenys, digital agency in Douala: posters and social media, events, community management and brand identities.' },
 }[lang];
 ---
 <Layout lang={lang} title={seo.title} description={seo.description} altHref={routes.work[lang === 'fr' ? 'en' : 'fr']} current="work">
   <PageHeader eyebrow={t('work.eyebrow')} title={t('work.title')} lead={t('work.lead')} />
 
-  <section class="section-tight work" aria-label={t('work.eyebrow')} data-work>
-    <div class="container">
-      <div class="filters-wrap">
-        <div class="filters" role="group" aria-label={t('work.filter')} data-filters hidden>
-          <button type="button" aria-pressed="true" data-filter="all">{t('work.all')}</button>
-          {used.map((s) => <button type="button" aria-pressed="false" data-filter={s.id}>{s.title[lang]}</button>)}
+  {empty ? (
+    <section class="section-tight">
+      <div class="container">
+        <div class="soon callout" data-reveal>
+          <h2 class="t-3">{t('work.soon.title')}</h2>
+          <p>{t('work.soon.text')}</p>
+          <a class="btn btn-primary" href={routes.contact[lang]}>{t('work.soon.cta')}</a>
         </div>
       </div>
+    </section>
+  ) : (
+    <section class="section-tight work" aria-label={t('work.eyebrow')} data-work>
+      <div class="container">
+        {used.length > 1 && (
+          <div class="filters-wrap">
+            <div class="filters" role="group" aria-label={t('work.filter')} data-filters hidden>
+              <button type="button" aria-pressed="true" data-filter="all">{t('work.all')}</button>
+              {used.map((c) => <button type="button" aria-pressed="false" data-filter={c}>{categories[c][lang]}</button>)}
+            </div>
+          </div>
+        )}
 
-      <div class="grid" data-grid>
-        {projects.map((p, i) => <ProjectCard project={p} lang={lang} delay={(i % 3) * 80} level={2} />)}
+        {projects.length > 0 && (
+          <div class="grid" data-grid>
+            {projects.map((p, i) => <ProjectCard project={p} lang={lang} delay={(i % 3) * 80} level={2} />)}
+          </div>
+        )}
+        <p class="sr-only" aria-live="polite" data-live></p>
       </div>
-      <p class="empty muted" hidden data-empty>{t('work.empty')}</p>
-      <p class="sr-only" aria-live="polite" data-live></p>
-    </div>
-  </section>
+    </section>
+  )}
+
+  {logos.length > 0 && (
+    <section class="section bg-soft logos-section" aria-labelledby="identities-title" data-logos>
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <p class="eyebrow">{categories.identity[lang]}</p>
+          <h2 id="identities-title" class="t-2">{t('work.identities')}</h2>
+          <p class="lead">{t('work.identitiesLead')}</p>
+        </div>
+        <ul class="logos">
+          {logos.map((l, i) => (
+            <li data-reveal style={`--delay:${(i % 5) * 60}ms`}>
+              <figure data-tilt>
+                <WorkImage file={l.file} alt={`Logo ${l.client}`} sizes="(min-width: 1100px) 220px, (min-width: 640px) 30vw, 45vw" widths={[300, 600]} />
+                <figcaption>{l.client}{!l.authorized && <span class="badge">{t('work.pending')}</span>}</figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
 
   <CTA lang={lang} />
 </Layout>
 
 <script>
   const root = document.querySelector<HTMLElement>('[data-work]');
-  if (root) {
-    const bar = root.querySelector<HTMLElement>('[data-filters]')!;
+  const bar = root?.querySelector<HTMLElement>('[data-filters]');
+  if (root && bar) {
     const buttons = [...bar.querySelectorAll<HTMLButtonElement>('[data-filter]')];
-    const cards = [...root.querySelectorAll<HTMLElement>('[data-service]')];
-    const empty = root.querySelector<HTMLElement>('[data-empty]')!;
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-categories]')];
+    const grid = root.querySelector<HTMLElement>('[data-grid]');
+    const logos = document.querySelector<HTMLElement>('[data-logos]');
     const live = root.querySelector<HTMLElement>('[data-live]')!;
     bar.hidden = false;
 
     const apply = (f: string) => {
       buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === f)));
       let n = 0;
-      cards.forEach((c) => {
-        const show = f === 'all' || c.dataset.service === f;
+      cards.forEach((c, i) => {
+        const show = f === 'all' || c.dataset.categories!.split(' ').includes(f);
         c.hidden = !show;
-        if (show) { n++; c.classList.remove('is-in'); requestAnimationFrame(() => c.classList.add('is-in')); }
+        if (show) {
+          n++;
+          c.style.setProperty('--delay', `${(n % 3) * 60}ms`);
+          c.classList.remove('is-in');
+          requestAnimationFrame(() => requestAnimationFrame(() => c.classList.add('is-in')));
+        }
       });
-      empty.hidden = n > 0;
+      if (grid) grid.hidden = n === 0;
+      if (logos) logos.hidden = !(f === 'all' || f === 'identity');
       live.textContent = String(n);
       const url = new URL(location.href);
-      if (f === 'all') url.searchParams.delete('service'); else url.searchParams.set('service', f);
+      if (f === 'all') url.searchParams.delete('categorie'); else url.searchParams.set('categorie', f);
       history.replaceState(null, '', url);
     };
 
     buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.filter!)));
-    const initial = new URLSearchParams(location.search).get('service');
+    const initial = new URLSearchParams(location.search).get('categorie');
     if (initial && buttons.some((b) => b.dataset.filter === initial)) apply(initial);
   }
 </script>
 
 <style>
+  .soon { padding: clamp(28px, 4vw, 48px); max-width: 760px; }
+  .soon h2 { margin-bottom: 0.75rem; }
+  .soon .btn { margin-top: 1.25rem; }
+
   .filters-wrap {
+    position: sticky;
+    top: calc(var(--nav-h) + 12px);
+    z-index: 5;
     margin: 0 calc(var(--gutter) * -1) clamp(32px, 5vw, 56px);
     padding: 0 var(--gutter);
     overflow-x: auto;
@@ -83,8 +139,10 @@ const seo = {
     gap: 4px;
     padding: 4px;
     border-radius: 12px;
-    background: var(--soft);
-    box-shadow: inset 0 0 0 1px var(--line);
+    background: rgba(245, 250, 252, 0.86);
+    -webkit-backdrop-filter: saturate(180%) blur(16px);
+    backdrop-filter: saturate(180%) blur(16px);
+    box-shadow: inset 0 0 0 1px var(--line), 0 8px 24px -16px rgba(0, 49, 82, 0.3);
   }
   .filters[hidden] { display: none; }
   .filters button {
@@ -102,15 +160,24 @@ const seo = {
     transition: background-color 0.3s var(--ease), color 0.3s var(--ease), box-shadow 0.3s var(--ease);
   }
   .filters button:hover { color: var(--night); }
-  .filters button[aria-pressed='true'] {
-    background: var(--white);
-    color: var(--night);
-    box-shadow: 0 1px 3px rgba(0, 49, 82, 0.12), 0 0 0 1px var(--line);
-  }
+  .filters button[aria-pressed='true'] { background: var(--night); color: var(--white); }
 
   .grid { display: grid; gap: 48px 24px; }
-  .grid > :global([hidden]) { display: none; }
+  .grid[hidden], .grid > :global([hidden]), .logos-section[hidden] { display: none; }
   @media (min-width: 720px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (min-width: 1100px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  .empty { text-align: center; padding: 3rem 0; }
+
+  .logos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  @media (min-width: 640px) { .logos { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (min-width: 1100px) { .logos { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 20px; } }
+  .logos figure { margin: 0; }
+  .logos :global(img) {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: contain;
+    border-radius: var(--radius);
+    background: var(--white);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+  .logos figcaption { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 0.75rem; font-size: 0.875rem; font-weight: 500; color: var(--night); }
 </style>

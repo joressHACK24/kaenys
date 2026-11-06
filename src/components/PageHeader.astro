@@ -1,6 +1,7 @@
 ---
 interface Props { eyebrow: string; title: string; lead?: string; center?: boolean }
-const { eyebrow, title, lead, center = true } = Astro.props;
+// Charte : titres toujours alignés à gauche.
+const { eyebrow, title, lead, center = false } = Astro.props;
 ---
 <header class:list={['page-header container', { center }]}>
   <p class="eyebrow ph-in">{eyebrow}</p>

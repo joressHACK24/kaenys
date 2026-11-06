@@ -10,13 +10,14 @@ const steps = [1, 2, 3, 4].map((n) => ({
   text: t(`process.${n}.text` as 'process.1.text'),
 }));
 ---
-<section class="process section bg-night" aria-labelledby="process-title" data-process>
+<section class="process section deco" aria-labelledby="process-title" data-process>
+  <svg class="deco-chev" style="right:-6%;top:12%;color:var(--sky);opacity:.5" viewBox="0 0 234 118" aria-hidden="true" data-parallax="0.12"><path d="M115 0 234 117H167L115 65 64 117H0Z" /></svg>
   <div class="container">
     <div class="process-grid">
       <div class="process-aside">
         <div class="process-sticky">
           <p class="eyebrow">{t('home.process.eyebrow')}</p>
-          <h2 id="process-title" class="t-1">{t('home.process.title')}</h2>
+          <h2 id="process-title" class="t-1" data-split>{t('home.process.title')}</h2>
           <div class="process-counter" aria-hidden="true">
             <span class="process-num" data-process-num>01</span>
             <span class="process-total">/ 04</span>
@@ -74,13 +75,13 @@ const steps = [1, 2, 3, 4].map((n) => ({
   .process-bar { display: none; }
 
   .process-steps { list-style: none; margin: 0; padding: 0; counter-reset: s; }
-  .process-step { padding: 2.25rem 0; border-top: 1px solid rgba(255, 255, 255, 0.14); }
+  .process-step { padding: 2.25rem 0; border-top: 1px solid var(--line); }
   .process-step-n {
     display: block;
     font-family: var(--font-display);
     font-size: 1.1875rem;
-    font-weight: 600;
-    color: var(--sky);
+    font-weight: 700;
+    color: var(--blue);
     margin-bottom: 0.75rem;
   }
   .process-step .lead { margin-top: 1rem; max-width: 36ch; }
@@ -98,21 +99,21 @@ const steps = [1, 2, 3, 4].map((n) => ({
       letter-spacing: -0.04em;
       overflow: hidden;
     }
-    .process-num { font-size: clamp(5rem, 10vw, 9rem); line-height: 1; color: var(--sky); display: inline-block; }
+    .process-num { font-size: clamp(5rem, 10vw, 9rem); line-height: 1; color: var(--blue); display: inline-block; }
     .process-num:global(.flip) { animation: flip 0.6s var(--ease); }
-    .process-total { font-size: 1.5rem; color: rgba(255, 255, 255, 0.5); }
+    .process-total { font-size: 1.5rem; color: var(--muted); }
     .process-bar {
       display: block;
       margin-top: 2rem;
       height: 2px;
       max-width: 320px;
-      background: rgba(255, 255, 255, 0.14);
+      background: var(--line);
       overflow: hidden;
     }
     .process-bar span {
       display: block;
       height: 100%;
-      background: var(--sky);
+      background: var(--night);
       transform-origin: left;
       transform: scaleX(0.25);
       transition: transform 0.8s var(--ease);
@@ -124,7 +125,7 @@ const steps = [1, 2, 3, 4].map((n) => ({
       justify-content: center;
       border-top: 0;
       padding: 0;
-      opacity: 0.28;
+      opacity: 0.22;
       transition: opacity 0.6s var(--ease);
     }
     :global(.js) .process-step:global(.is-active) { opacity: 1; }

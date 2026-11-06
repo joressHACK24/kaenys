@@ -1,0 +1,29 @@
+---
+import { Image } from 'astro:assets';
+import { loadImage } from '../data/projects';
+
+interface Props {
+  file: string;
+  alt: string;
+  sizes: string;
+  widths?: number[];
+  class?: string;
+  eager?: boolean;
+  [key: string]: unknown;
+}
+const { file, alt, sizes, widths = [400, 720, 1080, 1600], class: cls, eager = false, ...rest } = Astro.props;
+const src = await loadImage(file);
+const w = widths.filter((x) => x <= src.width);
+---
+<Image
+  src={src}
+  alt={alt}
+  widths={w.length ? w : [src.width]}
+  sizes={sizes}
+  format="webp"
+  quality={78}
+  loading={eager ? 'eager' : 'lazy'}
+  decoding="async"
+  class={cls}
+  {...rest}
+/>

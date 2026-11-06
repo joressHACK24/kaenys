@@ -12,7 +12,7 @@ const t = useT(lang);
     <div class="hero-copy container" data-hero-copy>
       <h1 id="hero-title" class="t-hero hero-title">{t('hero.title')}</h1>
       <p class="lead hero-sub">{t('hero.sub')}</p>
-      <div class="actions center hero-actions">
+      <div class="actions hero-actions">
         <a class="btn btn-light btn-lg" href={routes.contact[lang]}>{t('hero.cta')}</a>
         <a class="link-arrow" href={routes.work[lang]}>{t('hero.secondary')} <Icon name="chevron" /></a>
       </div>
@@ -109,12 +109,11 @@ const t = useT(lang);
   .hero-copy {
     position: relative;
     z-index: 2;
-    text-align: center;
     opacity: calc(1 - var(--p) * 1.8);
     transform: translate3d(0, calc(var(--p) * -60px), 0) scale(calc(1 - var(--p) * 0.06));
   }
-  .hero-title { max-width: 14ch; margin-inline: auto; }
-  .hero-sub { margin: 1.25rem auto 0; max-width: 34ch; }
+  .hero-title { max-width: 13ch; }
+  .hero-sub { margin: 1.5rem 0 0; max-width: 34ch; }
   .hero-actions { margin-top: 2rem; }
 
   .hero-title, .hero-sub, .hero-actions { animation: rise 1.1s var(--ease) both; }
@@ -128,11 +127,17 @@ const t = useT(lang);
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    opacity: calc(0.2 + var(--p) * 1.4);
+    opacity: calc(var(--art) + var(--p) * 1.4);
+    --art: 0.16;
   }
   .hero-stage {
     position: absolute;
     inset: calc(var(--nav-h) + 4vh) 0 4vh;
+  }
+  /* Sur grand écran, le symbole occupe la moitié droite, à côté du texte. */
+  @media (min-width: 960px) {
+    .hero-art { --art: 0.32; }
+    .hero-stage { inset: calc(var(--nav-h) + 6vh) 0 6vh 46%; }
   }
   .hero-canvas {
     position: absolute;
