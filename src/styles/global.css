@@ -1,17 +1,9 @@
 /* ==========================================================================
    Kaenys — système de design
-   Couleurs et typographies conformes au cahier des charges (section 7).
+   Couleurs conformes à la charte graphique.
+   Typographie : Poppins pour les titres et le texte. Unigeo, prévue par la charte,
+   n'est pas utilisée (licence commerciale non acquise, décision des associés).
    ========================================================================== */
-
-/* Unigeo (titres) : déposer le fichier WOFF2 sous public/fonts/unigeo.woff2
-   une fois la licence web vérifiée, puis décommenter ce bloc.
-@font-face {
-  font-family: 'Unigeo';
-  src: url('/fonts/unigeo.woff2') format('woff2');
-  font-weight: 400 800;
-  font-display: swap;
-}
-*/
 
 :root {
   --night: #003152;
@@ -25,7 +17,7 @@
   --line: rgba(0, 49, 82, 0.14);
   --line-strong: rgba(0, 49, 82, 0.32);
 
-  --font-display: 'Unigeo', 'Poppins', system-ui, sans-serif;
+  --font-display: 'Poppins', system-ui, sans-serif;
   --font-text: 'Poppins', system-ui, sans-serif;
 
   --radius: 12px;
