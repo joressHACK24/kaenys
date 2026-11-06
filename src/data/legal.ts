@@ -24,7 +24,7 @@ export const legal: Record<LegalKey, Record<Lang, Doc>> = {
       updated: '16 novembre 2026',
       draftNote: draftFr,
       sections: [
-        { h: 'Éditeur du site', p: ['Kaenys, [forme juridique et raison sociale à compléter], Douala, Cameroun.', 'Numéro d’immatriculation : [à compléter après enregistrement].', 'Contact : <a href="mailto:contact@kaenys.com">contact@kaenys.com</a>.', 'Responsables de la publication : Joress Fritz Nyam Fotso et Bryan Nlend Biyeguel Linkholn.'] },
+        { h: 'Éditeur du site', p: ['Kaenys, [forme juridique et raison sociale à compléter], Douala, Cameroun.', 'Numéro d’immatriculation : [à compléter après enregistrement].', 'Contact : <a href="mailto:contact@kaenys.com">contact@kaenys.com</a>.', 'Responsables de la publication : Joress Fritz Nyam Fotso et Bryan Nlend Biheguel Linkholn.'] },
         { h: 'Hébergement', p: ['Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, États-Unis — <a href="https://www.cloudflare.com" rel="noopener">cloudflare.com</a>.'] },
         { h: 'Propriété intellectuelle', p: ['Les textes, logos, visuels et vidéos de ce site appartiennent à Kaenys ou à ses clients, qui en ont autorisé la diffusion. Toute reproduction sans accord écrit est interdite.'] },
         { h: 'Statistiques de visite', p: ['Le site utilise Cloudflare Web Analytics, un outil de mesure d’audience sans cookies, qui ne collecte pas de données permettant de vous identifier.'] },
@@ -36,7 +36,7 @@ export const legal: Record<LegalKey, Record<Lang, Doc>> = {
       updated: '16 November 2026',
       draftNote: draftEn,
       sections: [
-        { h: 'Publisher', p: ['Kaenys, [legal form and company name to be completed], Douala, Cameroon.', 'Registration number: [to be completed after registration].', 'Contact: <a href="mailto:contact@kaenys.com">contact@kaenys.com</a>.', 'Publication managers: Joress Fritz Nyam Fotso and Bryan Nlend Biyeguel Linkholn.'] },
+        { h: 'Publisher', p: ['Kaenys, [legal form and company name to be completed], Douala, Cameroon.', 'Registration number: [to be completed after registration].', 'Contact: <a href="mailto:contact@kaenys.com">contact@kaenys.com</a>.', 'Publication managers: Joress Fritz Nyam Fotso and Bryan Nlend Biheguel Linkholn.'] },
         { h: 'Hosting', p: ['Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, United States — <a href="https://www.cloudflare.com" rel="noopener">cloudflare.com</a>.'] },
         { h: 'Intellectual property', p: ['The text, logos, visuals and videos on this site belong to Kaenys or to its clients, who have authorised their publication. Any reproduction without written consent is prohibited.'] },
         { h: 'Visitor analytics', p: ['This site uses Cloudflare Web Analytics, a cookie-free audience measurement tool that does not collect data that can identify you.'] },
