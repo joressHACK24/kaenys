@@ -29,7 +29,7 @@ npm run preview   # sert dist/ en local
 ## À faire avant la mise en ligne (16 novembre 2026)
 
 - [ ] **Logo** : remplacer le tracé provisoire (`src/data/logo.ts`, `public/favicon.svg`, `public/logo-kaenys.svg`) par les SVG officiels.
-- [x] **Typographie** : Poppins pour les titres et le texte. Unigeo n'est pas utilisée : sa version gratuite interdit l'usage commercial et la licence complète n'a pas été achetée.
+- [x] **Typographie** : Outfit pour les titres et le logotype, Poppins pour le texte (licences libres, usage commercial autorisé). Unigeo n'est pas retenue : licence commerciale trop chère.
 - [x] **Coordonnées** : WhatsApp +237 698 47 96 49, appels +237 697 53 52 63.
 - [ ] **Réseaux sociaux** : vérifier les liens Instagram, Facebook et LinkedIn dans `src/config.ts`.
 - [ ] **Tarifs** : renseigner les montants `from` dans `src/data/pricing.ts` (affiche « Sur devis » tant qu'ils sont vides).
