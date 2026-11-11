@@ -1,5 +1,5 @@
 ---
-import { SYMBOL_PATH, SYMBOL_VIEWBOX, WORDMARK_PATH } from '../data/logo';
+import { SYMBOL_PATH, SYMBOL_VIEWBOX, LOGO_VIEWBOX, WORDMARK_PATH } from '../data/logo';
 
 interface Props {
   /** "dark" = bleu nuit sur fond clair, "light" = blanc sur fond bleu nuit */
@@ -11,7 +11,7 @@ interface Props {
 const { tone = 'dark', symbolOnly = false, class: cls = '', title = 'Kaenys' } = Astro.props;
 const symbolFill = tone === 'dark' ? '#ADDFF1' : '#FFFFFF';
 const wordFill = tone === 'dark' ? '#003152' : '#FFFFFF';
-const viewBox = symbolOnly ? SYMBOL_VIEWBOX : '0 0 1141 250.1';
+const viewBox = symbolOnly ? SYMBOL_VIEWBOX : LOGO_VIEWBOX;
 ---
 <svg class={`logo ${cls}`} viewBox={viewBox} role="img" aria-label={title} xmlns="http://www.w3.org/2000/svg">
   <path d={SYMBOL_PATH} fill={symbolFill} fill-rule="evenodd" stroke={tone === 'dark' ? '#003152' : 'none'} stroke-width="0.83" />
